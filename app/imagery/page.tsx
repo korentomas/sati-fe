@@ -371,11 +371,76 @@ export default function ImageryPage() {
               Use polygon tool to draw custom search area or use default Europe bbox
             </div>
           </div>
-          <ImageryMap
-            onPolygonDrawn={handlePolygonDrawn}
-            layers={mapLayers}
-            onLayerUpdate={handleLayerUpdate}
-          />
+          <div style={{ position: 'relative' }}>
+            <ImageryMap
+              onPolygonDrawn={handlePolygonDrawn}
+              layers={mapLayers}
+              onLayerUpdate={handleLayerUpdate}
+            />
+            {mapLayers.length > 0 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  zIndex: 1000,
+                  background: '#fff',
+                  border: '2px solid #000',
+                  borderRadius: '4px',
+                  padding: '8px',
+                  maxWidth: '200px',
+                  fontSize: '11px',
+                }}
+              >
+                <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                  LAYERS [{mapLayers.length}]
+                </div>
+                {mapLayers.map(layer => (
+                  <div key={layer.id} style={{ marginBottom: '8px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <input
+                        type="checkbox"
+                        checked={layer.visible}
+                        onChange={(e) => handleLayerUpdate(layer.id, { visible: e.target.checked })}
+                      />
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {layer.name}
+                      </span>
+                    </label>
+                    <div style={{ marginLeft: '20px', marginTop: '4px' }}>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={layer.opacity * 100}
+                        onChange={(e) => handleLayerUpdate(layer.id, { opacity: Number(e.target.value) / 100 })}
+                        style={{ width: '100%' }}
+                        disabled={!layer.visible}
+                      />
+                      <div style={{ fontSize: '9px', color: '#666' }}>
+                        Opacity: {Math.round(layer.opacity * 100)}%
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleLayerRemove(layer.id)}
+                      style={{
+                        marginTop: '4px',
+                        marginLeft: '20px',
+                        padding: '2px 6px',
+                        fontSize: '9px',
+                        background: '#ff0000',
+                        color: '#fff',
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

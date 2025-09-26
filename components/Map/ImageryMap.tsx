@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, memo } from 'react'
 import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import '@geoman-io/leaflet-geoman-free'
 
 // Fix Leaflet default marker icon issue
@@ -34,8 +35,6 @@ const ImageryMap = memo(({ onPolygonDrawn, layers = [], onLayerUpdate, center = 
   const containerRef = useRef<HTMLDivElement>(null)
   const callbackRef = useRef(onPolygonDrawn)
   const layersRef = useRef<Map<string, L.TileLayer>>(new Map())
-  const layerControlRef = useRef<L.Control.Layers | null>(null)
-  const baseLayerRef = useRef<L.TileLayer | null>(null)
 
   // Update callback ref when it changes
   useEffect(() => {
@@ -55,17 +54,6 @@ const ImageryMap = memo(({ onPolygonDrawn, layers = [], onLayerUpdate, center = 
       attribution: '© OpenStreetMap contributors',
     })
     osmLayer.addTo(map)
-    baseLayerRef.current = osmLayer
-
-    // Create layer control
-    const baseLayers = {
-      'OpenStreetMap': osmLayer
-    }
-
-    layerControlRef.current = L.control.layers(baseLayers, {}, {
-      position: 'topright',
-      collapsed: false
-    }).addTo(map)
 
     // Initialize Geoman controls
     (map as any).pm.addControls({
@@ -105,32 +93,34 @@ const ImageryMap = memo(({ onPolygonDrawn, layers = [], onLayerUpdate, center = 
 
   // Handle layer changes
   useEffect(() => {
-    if (!mapRef.current || !layerControlRef.current) return
+    if (!mapRef.current) return
 
     const map = mapRef.current
-    const control = layerControlRef.current
 
     // Update or add layers
     layers.forEach(layer => {
       let tileLayer = layersRef.current.get(layer.id)
 
       if (!tileLayer) {
-        // Create new layer
-        tileLayer = L.tileLayer(layer.url, {
-          opacity: layer.opacity,
-          bounds: layer.bounds,
-          attribution: `© ${layer.name}`,
-        })
-        layersRef.current.set(layer.id, tileLayer)
-
-        // Add to layer control
-        control.addOverlay(tileLayer, layer.name)
-
-        // Add to map if visible
-        if (layer.visible) {
-          tileLayer.addTo(map)
+        // Create new layer - use a simple image overlay for now
+        // In production, you'd use a proper tile service
+        if (layer.bounds && layer.url) {
+          try {
+            // For now, create an image overlay if we have bounds
+            // This is temporary - real implementation would use TMS tiles
+            tileLayer = L.tileLayer(layer.url, {
+              opacity: layer.opacity,
+              attribution: `© ${layer.name}`,
+            })
+            layersRef.current.set(layer.id, tileLayer)
+          } catch (err) {
+            console.error('Error creating layer:', err)
+            return
+          }
         }
-      } else {
+      }
+
+      if (tileLayer) {
         // Update existing layer
         tileLayer.setOpacity(layer.opacity)
 
@@ -145,7 +135,6 @@ const ImageryMap = memo(({ onPolygonDrawn, layers = [], onLayerUpdate, center = 
     // Remove layers that are no longer in the list
     layersRef.current.forEach((tileLayer, id) => {
       if (!layers.find(l => l.id === id)) {
-        control.removeLayer(tileLayer)
         if (map.hasLayer(tileLayer)) {
           map.removeLayer(tileLayer)
         }
