@@ -1,7 +1,9 @@
 # Supabase Setup Instructions
 
 ## The Issue
+
 The current Supabase API key is invalid (returning 401 Unauthorized). You need to either:
+
 1. Get the correct keys from your existing Supabase project
 2. Create a new Supabase project
 

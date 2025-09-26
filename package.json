@@ -7,9 +7,11 @@
     "build": "next build --turbopack",
     "start": "next start",
     "type-check": "tsc --noEmit",
+    "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
-    "test": "echo 'Tests will be added soon'"
+    "test": "echo 'Tests will be added soon'",
+    "precommit": "npm run format:check && npm run type-check && npm run lint"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.7",
@@ -26,6 +28,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "^9.36.0",
+    "eslint-config-next": "^15.5.4",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"

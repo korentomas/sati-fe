@@ -44,16 +44,12 @@ export default function RegisterPage() {
     return (
       <div className="auth-container">
         <div className="panel">
-          <div className="panel-title">
-            SATI // Registration Successful
-          </div>
+          <div className="panel-title">SATI // Registration Successful</div>
           <div style={{ textAlign: 'center', padding: '20px' }}>
             <div className="success-message" style={{ fontSize: '14px', marginBottom: '16px' }}>
               REGISTRATION COMPLETE!
             </div>
-            <p style={{ marginBottom: '16px' }}>
-              Please check your email to verify your account.
-            </p>
+            <p style={{ marginBottom: '16px' }}>Please check your email to verify your account.</p>
             <p style={{ fontSize: '12px', color: '#666' }}>
               You may need to check your spam folder.
             </p>
@@ -71,12 +67,10 @@ export default function RegisterPage() {
   return (
     <div className="auth-container">
       <div className="panel">
-        <div className="panel-title">
-          SATI // New User Registration
-        </div>
+        <div className="panel-title">SATI // New User Registration</div>
 
         <div className="ascii-logo">
-{`   _____ ___  _______ ____
+          {`   _____ ___  _______ ____
   / ___//   |/_  __//  _/
   \\__ \\/ /| | / /   / /
  ___/ / ___ |/ /  _/ /
@@ -125,19 +119,10 @@ export default function RegisterPage() {
             />
           </div>
 
-          {error && (
-            <div className="error-message">
-              ERROR: {error}
-            </div>
-          )}
+          {error && <div className="error-message">ERROR: {error}</div>}
 
           <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
-            <button
-              type="submit"
-              className="primary"
-              disabled={loading}
-              style={{ flex: 1 }}
-            >
+            <button type="submit" className="primary" disabled={loading} style={{ flex: 1 }}>
               {loading ? 'PROCESSING...' : '[CREATE ACCOUNT]'}
             </button>
           </div>

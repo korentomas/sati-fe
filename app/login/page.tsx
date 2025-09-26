@@ -30,12 +30,10 @@ export default function LoginPage() {
   return (
     <div className="auth-container">
       <div className="panel">
-        <div className="panel-title">
-          SATI // Satellite Imagery Gateway - Login
-        </div>
+        <div className="panel-title">SATI // Satellite Imagery Gateway - Login</div>
 
         <div className="ascii-logo">
-{`   _____ ___  _______ ____
+          {`   _____ ___  _______ ____
   / ___//   |/_  __//  _/
   \\__ \\/ /| | / /   / /
  ___/ / ___ |/ /  _/ /
@@ -71,19 +69,10 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && (
-            <div className="error-message">
-              ERROR: {error}
-            </div>
-          )}
+          {error && <div className="error-message">ERROR: {error}</div>}
 
           <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
-            <button
-              type="submit"
-              className="primary"
-              disabled={loading}
-              style={{ flex: 1 }}
-            >
+            <button type="submit" className="primary" disabled={loading} style={{ flex: 1 }}>
               {loading ? 'AUTHENTICATING...' : '[LOGIN]'}
             </button>
           </div>

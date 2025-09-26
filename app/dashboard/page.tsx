@@ -16,7 +16,9 @@ export default function DashboardPage() {
   const [apiKeys, setApiKeys] = useState<any[]>([])
   const [newKeyName, setNewKeyName] = useState('')
   const [generatedKey, setGeneratedKey] = useState<string | null>(null)
-  const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking')
+  const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>(
+    'checking'
+  )
   const router = useRouter()
 
   useEffect(() => {
@@ -80,7 +82,7 @@ export default function DashboardPage() {
           <div className="panel-title">INITIALIZING...</div>
           <div style={{ padding: '20px', textAlign: 'center' }}>
             <div className="ascii-logo" style={{ fontSize: '10px' }}>
-{`   _____ ___  _______ ____
+              {`   _____ ___  _______ ____
   / ___//   |/_  __//  _/
   \\__ \\/ /| | / /   / /
  ___/ / ___ |/ /  _/ /
@@ -95,10 +97,15 @@ export default function DashboardPage() {
   return (
     <div className="container">
       <div className="panel" style={{ marginBottom: '16px' }}>
-        <div className="panel-title">
-          SATI // CONTROL PANEL
-        </div>
-        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="panel-title">SATI // CONTROL PANEL</div>
+        <div
+          style={{
+            padding: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <div style={{ fontSize: '12px' }}>
             <span>USER: {user?.email}</span>
             <span style={{ marginLeft: '16px' }}>SESSION: ACTIVE</span>
@@ -109,24 +116,36 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '16px' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+          gap: '16px',
+        }}
+      >
         <div className="panel">
-          <div className="panel-title">
-            SATI // System Status
-          </div>
+          <div className="panel-title">SATI // System Status</div>
           <div style={{ padding: '16px' }}>
-            <div>FRONTEND: <span style={{ color: '#0f0' }}>[ONLINE]</span></div>
-            <div>BACKEND: <span style={{ color: '#0f0' }}>[ONLINE]</span></div>
-            <div>AUTH: <span style={{ color: '#0f0' }}>[UNIFIED]</span></div>
-            <div>GIS ENGINE: <span style={{ color: '#666' }}>[PHASE 2]</span></div>
-            <div>STAC API: <span style={{ color: '#666' }}>[PHASE 3]</span></div>
+            <div>
+              FRONTEND: <span style={{ color: '#0f0' }}>[ONLINE]</span>
+            </div>
+            <div>
+              BACKEND: <span style={{ color: '#0f0' }}>[ONLINE]</span>
+            </div>
+            <div>
+              AUTH: <span style={{ color: '#0f0' }}>[UNIFIED]</span>
+            </div>
+            <div>
+              GIS ENGINE: <span style={{ color: '#666' }}>[PHASE 2]</span>
+            </div>
+            <div>
+              STAC API: <span style={{ color: '#666' }}>[PHASE 3]</span>
+            </div>
           </div>
         </div>
 
         <div className="panel">
-          <div className="panel-title">
-            SATI // API Management
-          </div>
+          <div className="panel-title">SATI // API Management</div>
           <div style={{ padding: '16px' }}>
             <div style={{ marginBottom: '16px' }}>
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -137,18 +156,17 @@ export default function DashboardPage() {
                   placeholder="Key name (e.g., production)"
                   style={{ flex: 1 }}
                 />
-                <button
-                  onClick={createApiKey}
-                  disabled={!newKeyName}
-                  className="primary"
-                >
+                <button onClick={createApiKey} disabled={!newKeyName} className="primary">
                   [CREATE]
                 </button>
               </div>
             </div>
 
             {generatedKey && (
-              <div className="success-message" style={{ marginBottom: '16px', padding: '8px', fontSize: '11px' }}>
+              <div
+                className="success-message"
+                style={{ marginBottom: '16px', padding: '8px', fontSize: '11px' }}
+              >
                 <div>API KEY GENERATED:</div>
                 <div style={{ wordBreak: 'break-all', marginTop: '4px', fontFamily: 'monospace' }}>
                   {generatedKey}
@@ -173,9 +191,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="panel">
-          <div className="panel-title">
-            SATI // Quick Actions
-          </div>
+          <div className="panel-title">SATI // Quick Actions</div>
           <div style={{ padding: '16px' }}>
             <button
               onClick={() => window.open('http://localhost:8000/api/v1/docs', '_blank')}
@@ -183,33 +199,27 @@ export default function DashboardPage() {
             >
               [VIEW API DOCS]
             </button>
-            <button
-              onClick={() => router.push('/map')}
-              style={{ width: '100%' }}
-              disabled={true}
-            >
+            <button onClick={() => router.push('/map')} style={{ width: '100%' }} disabled={true}>
               [OPEN MAP VIEW] (Phase 2)
             </button>
           </div>
         </div>
 
         <div className="panel">
-          <div className="panel-title">
-            SATI // Development Log
-          </div>
+          <div className="panel-title">SATI // Development Log</div>
           <div style={{ padding: '16px', fontSize: '11px', height: '150px', overflowY: 'auto' }}>
             <div>[{new Date().toLocaleTimeString()}] Session initialized</div>
             <div>[{new Date().toLocaleTimeString()}] Backend authenticated</div>
             <div>[{new Date().toLocaleTimeString()}] User profile loaded</div>
-            <div style={{ color: '#0f0' }}>[{new Date().toLocaleTimeString()}] ✓ Auth unified: Backend handles all</div>
+            <div style={{ color: '#0f0' }}>
+              [{new Date().toLocaleTimeString()}] ✓ Auth unified: Backend handles all
+            </div>
           </div>
         </div>
       </div>
 
       <div className="panel" style={{ marginTop: '16px' }}>
-        <div className="panel-title">
-          SATI // Architecture Status
-        </div>
+        <div className="panel-title">SATI // Architecture Status</div>
         <div style={{ padding: '16px', fontSize: '12px' }}>
           <div style={{ marginBottom: '12px', color: '#0f0' }}>
             <strong>✓ UNIFIED AUTH COMPLETE</strong>

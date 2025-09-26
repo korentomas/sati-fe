@@ -9,11 +9,13 @@
 3. Update the template to include the correct redirect URL:
 
 **Default template has:**
+
 ```html
 <a href="{{ .ConfirmationURL }}">Confirm your email</a>
 ```
 
 **Make sure the Redirect URL in Authentication Settings is set to:**
+
 ```
 http://localhost:3000/auth/confirm
 ```
@@ -24,11 +26,13 @@ http://localhost:3000/auth/confirm
 2. Update these settings:
 
 **Site URL:**
+
 ```
 http://localhost:3000
 ```
 
 **Redirect URLs (add these):**
+
 ```
 http://localhost:3000/auth/confirm
 http://localhost:3000/dashboard
@@ -45,6 +49,7 @@ If you want to skip email confirmation during development:
 ### 4. For Production
 
 When deploying to production, update the URLs to your production domain:
+
 - Site URL: `https://your-domain.com`
 - Redirect URLs: `https://your-domain.com/auth/confirm`
 

@@ -117,21 +117,25 @@ GitHub Actions workflows:
 ## Roadmap
 
 ### Phase 1: Authentication ✅
+
 - User registration and login
 - Protected routes
 - Session management
 
 ### Phase 2: Map Integration (In Progress)
+
 - Leaflet integration
 - Geoman drawing tools
 - AOI selection
 
 ### Phase 3: Satellite Search
+
 - Backend API integration
 - Search filters
 - Scene visualization
 
 ### Phase 4: Processing
+
 - NDVI/NDWI calculations
 - Job queue management
 - Result downloads
