@@ -25,6 +25,8 @@ export default function ImageryPage() {
   const [error, setError] = useState<string | null>(null)
   const [searchMode, setSearchMode] = useState<'bbox' | 'polygon'>('bbox')
   const [drawnPolygon, setDrawnPolygon] = useState<GeoJSON.Polygon | null>(null)
+  const [selectedBands, setSelectedBands] = useState<string[]>(['visual'])
+  const [processingLevel, setProcessingLevel] = useState<string>('l2a')
 
   // Simple bbox for demo (covers interesting area)
   const defaultBbox: [number, number, number, number] = [-10, 35, 30, 60] // Europe

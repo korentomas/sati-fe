@@ -2,9 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import '@geoman-io/leaflet-geoman-free'
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
 
 // Fix Leaflet default marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -31,11 +29,19 @@ export default function ImageryMap({ onPolygonDrawn, center = [45, 10], zoom = 5
     const map = L.map(containerRef.current).setView(center, zoom)
     mapRef.current = map
 
-    // Add base tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors',
-    }).addTo(map)
+    // Add base tile layer with proper error handling
+    try {
+      const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors',
+      })
+
+      if (tileLayer && typeof tileLayer.addTo === 'function') {
+        tileLayer.addTo(map)
+      }
+    } catch (err) {
+      console.error('Error adding tile layer:', err)
+    }
 
     // Initialize Geoman controls
     (map as any).pm.addControls({
