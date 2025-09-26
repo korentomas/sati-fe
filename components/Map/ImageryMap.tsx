@@ -48,12 +48,21 @@ const ImageryMap = memo(({ onPolygonDrawn, layers = [], onLayerUpdate, center = 
     const map = L.map(containerRef.current).setView(center, zoom)
     mapRef.current = map
 
-    // Add base tile layer
-    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors',
-    })
-    osmLayer.addTo(map)
+    // Add base tile layer with error handling
+    try {
+      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors',
+      })
+
+      if (osmLayer && typeof osmLayer.addTo === 'function') {
+        osmLayer.addTo(map)
+      } else {
+        console.warn('TileLayer created but addTo method not available')
+      }
+    } catch (err) {
+      console.error('Error creating tile layer:', err)
+    }
 
     // Initialize Geoman controls
     (map as any).pm.addControls({
