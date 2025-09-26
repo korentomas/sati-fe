@@ -1,0 +1,36 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd sati-fe
+
+echo "🔍 Running pre-commit checks..."
+
+# Format check
+echo "📝 Checking formatting..."
+npm run format:check || {
+  echo "❌ Format check failed. Run 'npm run format' to fix."
+  exit 1
+}
+
+# Type check
+echo "🔧 Checking types..."
+npm run type-check || {
+  echo "❌ Type check failed."
+  exit 1
+}
+
+# Lint
+echo "🧹 Running linter..."
+npm run lint || {
+  echo "❌ Lint failed."
+  exit 1
+}
+
+# Accessibility audit
+echo "♿ Checking color accessibility..."
+npm run audit:colors || {
+  echo "❌ Accessibility check failed. Fix color contrast issues."
+  exit 1
+}
+
+echo "✅ All checks passed!"
