@@ -13,10 +13,10 @@ interface UserProfile {
 export default function DashboardPage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [apiKeys, setApiKeys] = useState<any[]>([])
+  const [apiKeys, setApiKeys] = useState<Array<{ key_id: string; name: string; created_at: string }>>([])
   const [newKeyName, setNewKeyName] = useState('')
   const [generatedKey, setGeneratedKey] = useState<string | null>(null)
-  const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>(
+  const [, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>(
     'checking'
   )
   const router = useRouter()
@@ -180,7 +180,7 @@ export default function DashboardPage() {
               {apiKeys.length === 0 ? (
                 <div style={{ color: '#666' }}>No API keys yet</div>
               ) : (
-                apiKeys.map((key: any, idx) => (
+                apiKeys.map((key, idx) => (
                   <div key={idx} style={{ marginBottom: '4px' }}>
                     • {key.name} - {new Date(key.created_at).toLocaleDateString()}
                   </div>

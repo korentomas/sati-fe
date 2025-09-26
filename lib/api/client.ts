@@ -1,4 +1,4 @@
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   data?: T
   error?: string
   status: number
@@ -54,9 +54,9 @@ class ApiClient {
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string> || {}),
     }
 
     if (this.token && endpoint !== '/auth/login' && endpoint !== '/auth/register') {
@@ -125,8 +125,8 @@ class ApiClient {
     return response
   }
 
-  async logout(): Promise<ApiResponse<any>> {
-    const response = await this.request('/auth/logout', {
+  async logout(): Promise<ApiResponse<void>> {
+    const response = await this.request<void>('/auth/logout', {
       method: 'POST',
     })
 
@@ -136,8 +136,8 @@ class ApiClient {
     return response
   }
 
-  async verifyToken(): Promise<ApiResponse<any>> {
-    return this.request('/auth/verify')
+  async verifyToken(): Promise<ApiResponse<UserProfile>> {
+    return this.request<UserProfile>('/auth/verify')
   }
 
   async getProfile(): Promise<ApiResponse<UserProfile>> {
@@ -151,19 +151,19 @@ class ApiClient {
     })
   }
 
-  async listApiKeys(): Promise<ApiResponse<any[]>> {
-    return this.request<any[]>('/auth/api-keys')
+  async listApiKeys(): Promise<ApiResponse<ApiKeyResponse[]>> {
+    return this.request<ApiKeyResponse[]>('/auth/api-keys')
   }
 
-  async deleteApiKey(keyId: string): Promise<ApiResponse<any>> {
-    return this.request(`/auth/api-keys/${keyId}`, {
+  async deleteApiKey(keyId: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/auth/api-keys/${keyId}`, {
       method: 'DELETE',
     })
   }
 
   // Health check
-  async healthCheck(): Promise<ApiResponse<any>> {
-    return this.request('/health')
+  async healthCheck(): Promise<ApiResponse<{ status: string; message: string }>> {
+    return this.request<{ status: string; message: string }>('/health')
   }
 
   // Clear token (for logout)
