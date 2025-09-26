@@ -12,16 +12,30 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
+export interface ImageryLayer {
+  id: string
+  name: string
+  url: string
+  bounds?: L.LatLngBoundsExpression
+  opacity: number
+  visible: boolean
+}
+
 interface ImageryMapProps {
   onPolygonDrawn: (polygon: GeoJSON.Polygon) => void
+  layers?: ImageryLayer[]
+  onLayerUpdate?: (layerId: string, updates: Partial<ImageryLayer>) => void
   center?: [number, number]
   zoom?: number
 }
 
-const ImageryMap = memo(({ onPolygonDrawn, center = [45, 10], zoom = 5 }: ImageryMapProps) => {
+const ImageryMap = memo(({ onPolygonDrawn, layers = [], onLayerUpdate, center = [45, 10], zoom = 5 }: ImageryMapProps) => {
   const mapRef = useRef<L.Map | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const callbackRef = useRef(onPolygonDrawn)
+  const layersRef = useRef<Map<string, L.TileLayer>>(new Map())
+  const layerControlRef = useRef<L.Control.Layers | null>(null)
+  const baseLayerRef = useRef<L.TileLayer | null>(null)
 
   // Update callback ref when it changes
   useEffect(() => {
@@ -35,19 +49,23 @@ const ImageryMap = memo(({ onPolygonDrawn, center = [45, 10], zoom = 5 }: Imager
     const map = L.map(containerRef.current).setView(center, zoom)
     mapRef.current = map
 
-    // Add base tile layer with proper error handling
-    try {
-      const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors',
-      })
+    // Add base tile layer
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors',
+    })
+    osmLayer.addTo(map)
+    baseLayerRef.current = osmLayer
 
-      if (tileLayer && typeof tileLayer.addTo === 'function') {
-        tileLayer.addTo(map)
-      }
-    } catch (err) {
-      console.error('Error adding tile layer:', err)
+    // Create layer control
+    const baseLayers = {
+      'OpenStreetMap': osmLayer
     }
+
+    layerControlRef.current = L.control.layers(baseLayers, {}, {
+      position: 'topright',
+      collapsed: false
+    }).addTo(map)
 
     // Initialize Geoman controls
     (map as any).pm.addControls({
@@ -84,6 +102,57 @@ const ImageryMap = memo(({ onPolygonDrawn, center = [45, 10], zoom = 5 }: Imager
       mapRef.current = null
     }
   }, []) // Remove dependencies to prevent re-initialization
+
+  // Handle layer changes
+  useEffect(() => {
+    if (!mapRef.current || !layerControlRef.current) return
+
+    const map = mapRef.current
+    const control = layerControlRef.current
+
+    // Update or add layers
+    layers.forEach(layer => {
+      let tileLayer = layersRef.current.get(layer.id)
+
+      if (!tileLayer) {
+        // Create new layer
+        tileLayer = L.tileLayer(layer.url, {
+          opacity: layer.opacity,
+          bounds: layer.bounds,
+          attribution: `© ${layer.name}`,
+        })
+        layersRef.current.set(layer.id, tileLayer)
+
+        // Add to layer control
+        control.addOverlay(tileLayer, layer.name)
+
+        // Add to map if visible
+        if (layer.visible) {
+          tileLayer.addTo(map)
+        }
+      } else {
+        // Update existing layer
+        tileLayer.setOpacity(layer.opacity)
+
+        if (layer.visible && !map.hasLayer(tileLayer)) {
+          tileLayer.addTo(map)
+        } else if (!layer.visible && map.hasLayer(tileLayer)) {
+          map.removeLayer(tileLayer)
+        }
+      }
+    })
+
+    // Remove layers that are no longer in the list
+    layersRef.current.forEach((tileLayer, id) => {
+      if (!layers.find(l => l.id === id)) {
+        control.removeLayer(tileLayer)
+        if (map.hasLayer(tileLayer)) {
+          map.removeLayer(tileLayer)
+        }
+        layersRef.current.delete(id)
+      }
+    })
+  }, [layers])
 
   return (
     <div

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { imageryApi, Collection, SearchResponse, Scene } from '@/lib/api/imagery'
 import { useAuth } from '@/hooks/useAuth'
+import type { ImageryLayer } from '@/components/Map/ImageryMap'
 
 // Dynamic import to avoid SSR issues with Leaflet
 const ImageryMap = dynamic(() => import('@/components/Map/ImageryMap'), {
@@ -27,6 +28,7 @@ export default function ImageryPage() {
   const [drawnPolygon, setDrawnPolygon] = useState<GeoJSON.Polygon | null>(null)
   const [selectedBands, setSelectedBands] = useState<string[]>(['visual'])
   const [processingLevel, setProcessingLevel] = useState<string>('l2a')
+  const [mapLayers, setMapLayers] = useState<ImageryLayer[]>([])
 
   // Simple bbox for demo (covers interesting area)
   const defaultBbox: [number, number, number, number] = [-10, 35, 30, 60] // Europe
@@ -95,6 +97,64 @@ export default function ImageryPage() {
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString()
   }
+
+  const handleAddToMap = (scene: Scene) => {
+    // Check if layer already exists
+    const existingLayer = mapLayers.find(l => l.id === scene.id)
+    if (existingLayer) {
+      // Toggle visibility if layer exists
+      handleLayerUpdate(scene.id, { visible: !existingLayer.visible })
+      return
+    }
+
+    // For STAC, we typically need a COG (Cloud Optimized GeoTIFF) URL
+    // or a TileJSON endpoint for visualization
+    // For now, we'll use the thumbnail as a simple example
+    // In production, you'd want to use a tile server that can serve the actual imagery
+
+    // Check for visual asset or preview
+    let tileUrl = ''
+
+    if (scene.assets?.visual?.href) {
+      // If we have a visual asset, it might be a COG
+      // We'd need a COG tile server like TiTiler to serve it as tiles
+      // For demo, we'll use a placeholder
+      tileUrl = scene.assets.visual.href
+    } else if (scene.thumbnail_url) {
+      // Use thumbnail for preview (not ideal for actual map display)
+      tileUrl = scene.thumbnail_url
+    }
+
+    if (!tileUrl) {
+      setError('No imagery URL available for this scene')
+      return
+    }
+
+    // Add new layer
+    const newLayer: ImageryLayer = {
+      id: scene.id,
+      name: `${scene.collection} - ${formatDate(scene.properties.datetime)}`,
+      url: tileUrl,
+      opacity: 0.8,
+      visible: true,
+      bounds: scene.bbox ? [
+        [scene.bbox[1], scene.bbox[0]],
+        [scene.bbox[3], scene.bbox[2]]
+      ] : undefined
+    }
+
+    setMapLayers([...mapLayers, newLayer])
+  }
+
+  const handleLayerUpdate = useCallback((layerId: string, updates: Partial<ImageryLayer>) => {
+    setMapLayers(prev => prev.map(layer =>
+      layer.id === layerId ? { ...layer, ...updates } : layer
+    ))
+  }, [])
+
+  const handleLayerRemove = useCallback((layerId: string) => {
+    setMapLayers(prev => prev.filter(layer => layer.id !== layerId))
+  }, [])
 
   // Show loading while checking auth
   if (isLoading) {
@@ -260,6 +320,20 @@ export default function ImageryPage() {
                           {scene.properties.platform && (
                             <div>Platform: {scene.properties.platform}</div>
                           )}
+                          <button
+                            onClick={() => handleAddToMap(scene)}
+                            style={{
+                              marginTop: '8px',
+                              padding: '4px 8px',
+                              fontSize: '11px',
+                              background: mapLayers.find(l => l.id === scene.id) ? '#008000' : '#000080',
+                              color: '#fff',
+                              border: '1px solid #333',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {mapLayers.find(l => l.id === scene.id) ? '[ON MAP]' : '[ADD TO MAP]'}
+                          </button>
                         </div>
                         {scene.thumbnail_url && (
                           <img
@@ -270,7 +344,9 @@ export default function ImageryPage() {
                               height: '80px',
                               objectFit: 'cover',
                               border: '1px solid #666',
+                              cursor: 'pointer'
                             }}
+                            onClick={() => handleAddToMap(scene)}
                           />
                         )}
                       </div>
@@ -295,7 +371,11 @@ export default function ImageryPage() {
               Use polygon tool to draw custom search area or use default Europe bbox
             </div>
           </div>
-          <ImageryMap onPolygonDrawn={handlePolygonDrawn} />
+          <ImageryMap
+            onPolygonDrawn={handlePolygonDrawn}
+            layers={mapLayers}
+            onLayerUpdate={handleLayerUpdate}
+          />
         </div>
       </div>
 
