@@ -41,7 +41,7 @@ const ImageryMap = memo(
     const mapRef = useRef<L.Map | null>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const callbackRef = useRef(onPolygonDrawn)
-    const layersRef = useRef<Map<string, L.ImageOverlay | L.TileLayer>>(new Map())
+    const layersRef = useRef<Map<string, L.Layer>>(new Map())
 
     // Update callback ref when it changes
     useEffect(() => {
@@ -121,24 +121,46 @@ const ImageryMap = memo(
           // Create new layer
           if (layer.url) {
             try {
-              if (layer.bounds) {
-                // Use image overlay for thumbnails with known bounds
-                // Convert bounds to LatLngBounds if needed
-                const bounds = L.latLngBounds(layer.bounds as L.LatLngBoundsExpression)
-                mapLayer = L.imageOverlay(layer.url, bounds, {
+              // Check if it's a WMS URL
+              if (layer.url.includes('WMS') || layer.url.includes('wms')) {
+                // For WMS layers, use tileLayer.wms
+                mapLayer = (L.tileLayer as any).wms(layer.url.split('?')[0], {
+                  layers: 's2cloudless_3857',
+                  format: 'image/png',
+                  transparent: true,
                   opacity: layer.opacity,
                   attribution: `© ${layer.name}`,
                 })
+              } else if (layer.bounds && !layer.url.includes('{')) {
+                // Use image overlay for static images with known bounds
+                const bounds = L.latLngBounds(layer.bounds as L.LatLngBoundsExpression)
+
+                // For thumbnails, we'll create a simple colored rectangle as placeholder
+                // since the actual thumbnail URLs might not be accessible
+                console.log('Creating placeholder for:', layer.name)
+
+                // Create a simple rectangle to show the scene bounds
+                const rectangle = L.rectangle(bounds, {
+                  color: '#0f0',
+                  weight: 2,
+                  opacity: layer.opacity,
+                  fillColor: '#0f0',
+                  fillOpacity: layer.opacity * 0.2,
+                })
+
+                mapLayer = rectangle as any
               } else {
-                // Try as tile layer if it's a tile service URL
-                // This would work with TMS/XYZ tile services
+                // Try as tile layer if it's a tile service URL with placeholders
                 mapLayer = L.tileLayer(layer.url, {
                   opacity: layer.opacity,
                   attribution: `© ${layer.name}`,
                   maxZoom: 18,
                 })
               }
-              layersRef.current.set(layer.id, mapLayer)
+
+              if (mapLayer) {
+                layersRef.current.set(layer.id, mapLayer)
+              }
             } catch (err) {
               console.error('Error creating layer:', err)
               return

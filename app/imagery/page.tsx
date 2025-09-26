@@ -115,26 +115,34 @@ export default function ImageryPage() {
 
     // For STAC, we typically need a COG (Cloud Optimized GeoTIFF) URL
     // or a TileJSON endpoint for visualization
-    // For now, we'll use the thumbnail as a simple example
-    // In production, you'd want to use a tile server that can serve the actual imagery
+    // For demo purposes, we'll use a tile service URL pattern
+
+    console.log('Scene data:', scene)
+    console.log('Thumbnail URL:', scene.thumbnail_url)
+    console.log('Assets:', scene.assets)
 
     // Check for visual asset or preview
     let tileUrl = ''
 
-    if (scene.assets?.visual?.href) {
-      // If we have a visual asset, it might be a COG
-      // We'd need a COG tile server like TiTiler to serve it as tiles
-      // For demo, we'll use a placeholder
-      tileUrl = scene.assets.visual.href
+    // For Sentinel-2, we can try to construct a tile URL
+    // In production, you'd use a proper tile server
+    if (scene.collection.includes('sentinel-2')) {
+      // Use a public Sentinel-2 tile service as an example
+      // This is a placeholder - real implementation would use your own tile server
+      tileUrl = `https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&layers=s2cloudless_3857&width=256&height=256&format=image/png&transparent=true&version=1.1.1&bbox={bbox-epsg-3857}&srs=EPSG:3857&TIME=2023-01-01`
     } else if (scene.thumbnail_url) {
-      // Use thumbnail for preview (not ideal for actual map display)
-      tileUrl = scene.thumbnail_url
+      // Ensure thumbnail URL is complete
+      tileUrl = scene.thumbnail_url.startsWith('http')
+        ? scene.thumbnail_url
+        : `https://earth-search.aws.element84.com/v1${scene.thumbnail_url}`
     }
 
     if (!tileUrl) {
       setError('No imagery URL available for this scene')
       return
     }
+
+    console.log('Using tile URL:', tileUrl)
 
     // Add new layer
     const newLayer: ImageryLayer = {
