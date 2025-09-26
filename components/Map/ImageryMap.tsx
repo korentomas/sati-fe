@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, memo } from 'react'
 import L from 'leaflet'
 import '@geoman-io/leaflet-geoman-free'
 
@@ -18,9 +18,15 @@ interface ImageryMapProps {
   zoom?: number
 }
 
-export default function ImageryMap({ onPolygonDrawn, center = [45, 10], zoom = 5 }: ImageryMapProps) {
+const ImageryMap = memo(({ onPolygonDrawn, center = [45, 10], zoom = 5 }: ImageryMapProps) => {
   const mapRef = useRef<L.Map | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const callbackRef = useRef(onPolygonDrawn)
+
+  // Update callback ref when it changes
+  useEffect(() => {
+    callbackRef.current = onPolygonDrawn
+  }, [onPolygonDrawn])
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
@@ -62,7 +68,7 @@ export default function ImageryMap({ onPolygonDrawn, center = [45, 10], zoom = 5
       const layer = e.layer
       if (e.shape === 'Rectangle' || e.shape === 'Polygon') {
         const geoJson = layer.toGeoJSON() as GeoJSON.Feature<GeoJSON.Polygon>
-        onPolygonDrawn(geoJson.geometry)
+        callbackRef.current(geoJson.geometry)
 
         // Remove other polygons
         map.eachLayer((l: any) => {
@@ -77,7 +83,7 @@ export default function ImageryMap({ onPolygonDrawn, center = [45, 10], zoom = 5
       map.remove()
       mapRef.current = null
     }
-  }, [center, zoom, onPolygonDrawn])
+  }, []) // Remove dependencies to prevent re-initialization
 
   return (
     <div
@@ -90,4 +96,8 @@ export default function ImageryMap({ onPolygonDrawn, center = [45, 10], zoom = 5
       }}
     />
   )
-}
+})
+
+ImageryMap.displayName = 'ImageryMap'
+
+export default ImageryMap

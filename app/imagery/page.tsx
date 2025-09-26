@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { imageryApi, Collection, SearchResponse, Scene } from '@/lib/api/imagery'
 import { useAuth } from '@/hooks/useAuth'
@@ -50,10 +50,10 @@ export default function ImageryPage() {
     }
   }
 
-  const handlePolygonDrawn = (polygon: GeoJSON.Polygon) => {
+  const handlePolygonDrawn = useCallback((polygon: GeoJSON.Polygon) => {
     setDrawnPolygon(polygon)
     setSearchMode('polygon')
-  }
+  }, [])
 
   const handleSearch = async () => {
     if (searchMode === 'polygon' && !drawnPolygon) {
