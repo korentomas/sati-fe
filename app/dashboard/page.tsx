@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api/client'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
 
 interface UserProfile {
   user_id: string
@@ -11,6 +12,7 @@ interface UserProfile {
 }
 
 export default function DashboardPage() {
+  const { isLoading: authLoading, isAuthenticated, handleAuthError } = useAuth(true)
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [apiKeys, setApiKeys] = useState<Array<{ key_id: string; name: string; created_at: string }>>([])
@@ -23,34 +25,33 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const initialize = async () => {
-      // Check if user is authenticated
-      if (!apiClient.isAuthenticated()) {
-        router.push('/login')
-        return
-      }
-
-      // Verify token and get profile
-      const verifyResponse = await apiClient.verifyToken()
-      if (verifyResponse.error) {
-        router.push('/login')
+      // Wait for auth check to complete
+      if (authLoading || !isAuthenticated) {
         return
       }
 
       // Get user profile
-      const profileResponse = await apiClient.getProfile()
-      if (profileResponse.data) {
-        setUser(profileResponse.data)
-        setBackendStatus('connected')
-        loadApiKeys()
-      } else {
-        setBackendStatus('disconnected')
+      try {
+        const profileResponse = await apiClient.getProfile()
+        if (profileResponse.data) {
+          setUser(profileResponse.data)
+          setBackendStatus('connected')
+          loadApiKeys()
+        } else if (profileResponse.status === 401) {
+          // Auth error already handled by hook
+          handleAuthError(profileResponse)
+        } else {
+          setBackendStatus('disconnected')
+        }
+      } catch (err) {
+        handleAuthError(err)
+      } finally {
+        setLoading(false)
       }
-
-      setLoading(false)
     }
 
     initialize()
-  }, [router])
+  }, [authLoading, isAuthenticated, handleAuthError])
 
   const loadApiKeys = async () => {
     const response = await apiClient.listApiKeys()
@@ -73,6 +74,20 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     await apiClient.logout()
     router.push('/login')
+  }
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="container">
+        <div className="panel">
+          <div className="panel-title">SATI // Authenticating...</div>
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            <div>[ VERIFYING ACCESS ]</div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { imageryApi, Collection, SearchResponse, Scene } from '@/lib/api/imagery'
-import { apiClient } from '@/lib/api/client'
-import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function ImageryPage() {
-  const router = useRouter()
+  const { isLoading, isAuthenticated, handleAuthError } = useAuth(true)
   const [collections, setCollections] = useState<Collection[]>([])
   const [selectedCollection, setSelectedCollection] = useState<string>('sentinel-2-l2a')
   const [dateFrom, setDateFrom] = useState<string>(
@@ -22,44 +21,19 @@ export default function ImageryPage() {
   const defaultBbox: [number, number, number, number] = [-10, 35, 30, 60] // Europe
 
   useEffect(() => {
-    // Check authentication and validate token
-    const initializePage = async () => {
-      // First check if we have a token at all
-      if (!apiClient.isAuthenticated()) {
-        router.push('/login?from=/imagery')
-        return
-      }
-
-      // Try to load collections to verify token is valid
-      try {
-        const cols = await imageryApi.listCollections()
-        setCollections(cols)
-      } catch (err: any) {
-        // If we get 401, token is invalid/expired
-        if (err?.status === 401 || err?.message?.includes('401')) {
-          // Clear invalid token
-          apiClient.logout()
-          // Redirect to login
-          router.push('/login?from=/imagery')
-        } else {
-          console.error('Failed to load collections:', err)
-        }
-      }
+    // Load collections once authenticated
+    if (isAuthenticated) {
+      loadCollections()
     }
-
-    initializePage()
-  }, [router])
+  }, [isAuthenticated])
 
   const loadCollections = async () => {
     try {
       const cols = await imageryApi.listCollections()
       setCollections(cols)
     } catch (err: any) {
-      // Handle auth errors during refresh
-      if (err?.status === 401 || err?.message?.includes('401')) {
-        apiClient.logout()
-        router.push('/login?from=/imagery')
-      } else {
+      // Handle auth errors
+      if (!handleAuthError(err)) {
         console.error('Failed to load collections:', err)
       }
     }
@@ -81,10 +55,7 @@ export default function ImageryPage() {
       setSearchResults(results)
     } catch (err: any) {
       // Check if it's an auth error
-      if (err?.status === 401 || err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
-        // Session expired, redirect to login
-        router.push('/login?from=/imagery')
-      } else {
+      if (!handleAuthError(err)) {
         setError(err instanceof Error ? err.message : 'Search failed')
       }
     } finally {
@@ -94,6 +65,20 @@ export default function ImageryPage() {
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString()
+  }
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="container">
+        <div className="panel">
+          <div className="panel-title">SATI // Authenticating...</div>
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            <div>[ VERIFYING ACCESS ]</div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
