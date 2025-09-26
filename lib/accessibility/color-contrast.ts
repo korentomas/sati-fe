@@ -122,7 +122,11 @@ export const SATI_COLOR_PAIRS: ColorPair[] = [
 
   // Fixed alternatives
   { foreground: '#008800', background: '#ffffff', description: 'Dark green on white (ACCESSIBLE)' },
-  { foreground: '#886600', background: '#ffffff', description: 'Dark yellow on white (ACCESSIBLE)' },
+  {
+    foreground: '#886600',
+    background: '#ffffff',
+    description: 'Dark yellow on white (ACCESSIBLE)',
+  },
   { foreground: '#00cc00', background: '#000000', description: 'Medium green on black' },
 ]
 
@@ -135,7 +139,7 @@ export function auditColors(): void {
 
   let failures = 0
 
-  SATI_COLOR_PAIRS.forEach(pair => {
+  SATI_COLOR_PAIRS.forEach((pair) => {
     const result = checkColorContrast(pair.foreground, pair.background)
     const status = result.passesAA ? '✅' : '❌'
 

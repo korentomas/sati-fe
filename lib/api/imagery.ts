@@ -84,9 +84,7 @@ export const imageryApi = {
 
   // Get scene details
   async getScene(collectionId: string, sceneId: string): Promise<Scene | null> {
-    const response = await apiClient.request<Scene>(
-      `/imagery/scenes/${collectionId}/${sceneId}`
-    )
+    const response = await apiClient.request<Scene>(`/imagery/scenes/${collectionId}/${sceneId}`)
 
     if (response.error) {
       return null
