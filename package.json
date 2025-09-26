@@ -11,7 +11,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "test": "echo 'Tests will be added soon'",
-    "precommit": "npm run format:check && npm run type-check && npm run lint"
+    "test:a11y": "node scripts/a11y-check.js",
+    "audit:colors": "npx tsx lib/accessibility/color-contrast.ts",
+    "precommit": "npm run format:check && npm run type-check && npm run lint && npm run test:a11y"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.7",
@@ -24,14 +26,18 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@axe-core/react": "^4.10.2",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.8.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axe-playwright": "^2.2.2",
     "eslint": "^9.36.0",
     "eslint-config-next": "^15.5.4",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
