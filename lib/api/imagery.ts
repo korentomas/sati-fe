@@ -65,7 +65,10 @@ export const imageryApi = {
     })
 
     if (response.error) {
-      throw new Error(response.error)
+      // Include status code in error for auth handling
+      const error = new Error(response.error) as any
+      error.status = response.status
+      throw error
     }
 
     return response.data || { total: 0, returned: 0, scenes: [] }

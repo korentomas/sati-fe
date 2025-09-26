@@ -24,7 +24,8 @@ export default function ImageryPage() {
   useEffect(() => {
     // Check authentication
     if (!apiClient.isAuthenticated()) {
-      router.push('/login')
+      // Redirect to login with return URL
+      router.push('/login?from=/imagery')
       return
     }
 
@@ -55,8 +56,14 @@ export default function ImageryPage() {
         limit: 20,
       })
       setSearchResults(results)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Search failed')
+    } catch (err: any) {
+      // Check if it's an auth error
+      if (err?.status === 401 || err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
+        // Session expired, redirect to login
+        router.push('/login?from=/imagery')
+      } else {
+        setError(err instanceof Error ? err.message : 'Search failed')
+      }
     } finally {
       setLoading(false)
     }
