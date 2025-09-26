@@ -127,9 +127,46 @@ export default function ImageryPage() {
                 onChange={(e) => setSelectedCollection(e.target.value)}
                 style={{ width: '100%', padding: '8px' }}
               >
-                <option value="sentinel-2-l2a">Sentinel-2 L2A</option>
-                <option value="landsat-c2-l2">Landsat 8/9 Collection 2</option>
+                <option value="sentinel-2-l2a">Sentinel-2 L2A (10m)</option>
+                <option value="sentinel-2-l1c">Sentinel-2 L1C (Raw)</option>
+                <option value="landsat-c2-l2">Landsat 8/9 L2 (30m)</option>
+                <option value="landsat-c2-l1">Landsat 8/9 L1 (Raw)</option>
+                <option value="sentinel-1-grd">Sentinel-1 SAR GRD</option>
                 <option value="cop-dem-glo-30">Copernicus DEM 30m</option>
+                <option value="cop-dem-glo-90">Copernicus DEM 90m</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>
+                BAND COMBINATION:
+              </label>
+              <select
+                value={selectedBands[0]}
+                onChange={(e) => setSelectedBands([e.target.value])}
+                style={{ width: '100%', padding: '8px' }}
+              >
+                <option value="visual">True Color (RGB)</option>
+                <option value="false-color">False Color (NIR)</option>
+                <option value="ndvi">NDVI Vegetation</option>
+                <option value="ndwi">NDWI Water</option>
+                <option value="swir">SWIR Infrared</option>
+                <option value="urban">Urban False Color</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>
+                PROCESSING LEVEL:
+              </label>
+              <select
+                value={processingLevel}
+                onChange={(e) => setProcessingLevel(e.target.value)}
+                style={{ width: '100%', padding: '8px' }}
+              >
+                <option value="l1c">Level-1C (Top of Atmosphere)</option>
+                <option value="l2a">Level-2A (Surface Reflectance)</option>
+                <option value="l3">Level-3 (Monthly Composite)</option>
               </select>
             </div>
 
