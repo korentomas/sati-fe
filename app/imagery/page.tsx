@@ -113,25 +113,51 @@ export default function ImageryPage() {
       return
     }
 
-    // For STAC, we typically need a COG (Cloud Optimized GeoTIFF) URL
-    // or a TileJSON endpoint for visualization
-    // For demo purposes, we'll use a tile service URL pattern
-
+    // Check for COG assets to use with our tile server
     console.log('Scene data:', scene)
-    console.log('Thumbnail URL:', scene.thumbnail_url)
     console.log('Assets:', scene.assets)
 
-    // Check for visual asset or preview
     let tileUrl = ''
+    let cogUrl = ''
 
-    // For Sentinel-2, we can try to construct a tile URL
-    // In production, you'd use a proper tile server
-    if (scene.collection.includes('sentinel-2')) {
-      // Use a public Sentinel-2 tile service as an example
-      // This is a placeholder - real implementation would use your own tile server
+    // Look for COG assets in the scene
+    if (scene.assets) {
+      // For Sentinel-2, look for visual or TCI (True Color Image) asset
+      if (scene.collection.includes('sentinel-2')) {
+        // Priority: visual > TCI > individual bands
+        if (scene.assets['visual'] && scene.assets['visual'].href) {
+          cogUrl = scene.assets['visual'].href
+        } else if (scene.assets['TCI'] && scene.assets['TCI'].href) {
+          cogUrl = scene.assets['TCI'].href
+        } else if (scene.assets['B04'] && scene.assets['B04'].href) {
+          // Red band - we can use this for single-band visualization
+          cogUrl = scene.assets['B04'].href
+        }
+      } else if (scene.collection.includes('landsat')) {
+        // For Landsat, use visual or red band
+        if (scene.assets['visual'] && scene.assets['visual'].href) {
+          cogUrl = scene.assets['visual'].href
+        } else if (scene.assets['red'] && scene.assets['red'].href) {
+          cogUrl = scene.assets['red'].href
+        }
+      }
+    }
+
+    // If we have a COG URL, use our tile server for high-resolution imagery
+    if (cogUrl) {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+      const encodedUrl = encodeURIComponent(cogUrl)
+
+      // Construct tile URL for our backend tile server
+      tileUrl = `${apiUrl}/imagery/tiles/{z}/{x}/{y}.png?url=${encodedUrl}&bands=1,2,3&rescale=0,3000`
+
+      console.log('Using COG tile server:', tileUrl)
+      console.log('COG URL:', cogUrl)
+    } else if (scene.collection.includes('sentinel-2')) {
+      // Fallback to public WMS service if no COG available
       tileUrl = `https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&layers=s2cloudless_3857&width=256&height=256&format=image/png&transparent=true&version=1.1.1&bbox={bbox-epsg-3857}&srs=EPSG:3857&TIME=2023-01-01`
     } else if (scene.thumbnail_url) {
-      // Ensure thumbnail URL is complete
+      // Last resort: use thumbnail (low resolution)
       tileUrl = scene.thumbnail_url.startsWith('http')
         ? scene.thumbnail_url
         : `https://earth-search.aws.element84.com/v1${scene.thumbnail_url}`
@@ -141,8 +167,6 @@ export default function ImageryPage() {
       setError('No imagery URL available for this scene')
       return
     }
-
-    console.log('Using tile URL:', tileUrl)
 
     // Add new layer
     const newLayer: ImageryLayer = {

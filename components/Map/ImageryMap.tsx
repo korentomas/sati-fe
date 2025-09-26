@@ -131,6 +131,15 @@ const ImageryMap = memo(
                   opacity: layer.opacity,
                   attribution: `© ${layer.name}`,
                 })
+              } else if (layer.url.includes('{z}') && layer.url.includes('{x}') && layer.url.includes('{y}')) {
+                // This is a tile URL pattern - use as tile layer
+                mapLayer = L.tileLayer(layer.url, {
+                  opacity: layer.opacity,
+                  attribution: `© ${layer.name}`,
+                  maxZoom: 18,
+                  tileSize: 256,
+                  crossOrigin: true,
+                })
               } else if (layer.bounds && !layer.url.includes('{')) {
                 // Use image overlay for static images with known bounds
                 const bounds = L.latLngBounds(layer.bounds as L.LatLngBoundsExpression)
@@ -150,7 +159,7 @@ const ImageryMap = memo(
 
                 mapLayer = rectangle as any
               } else {
-                // Try as tile layer if it's a tile service URL with placeholders
+                // Try as generic tile layer
                 mapLayer = L.tileLayer(layer.url, {
                   opacity: layer.opacity,
                   attribution: `© ${layer.name}`,
