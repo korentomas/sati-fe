@@ -199,8 +199,11 @@ export default function DashboardPage() {
             >
               [VIEW API DOCS]
             </button>
+            <button onClick={() => router.push('/imagery')} style={{ width: '100%' }}>
+              [SEARCH SATELLITE IMAGERY] ✨
+            </button>
             <button onClick={() => router.push('/map')} style={{ width: '100%' }} disabled={true}>
-              [OPEN MAP VIEW] (Phase 2)
+              [OPEN MAP VIEW] (Coming Soon)
             </button>
           </div>
         </div>
