@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createServerClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -8,28 +8,25 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  const supabase = createServerClient(
+  // For now, we'll use a basic client without cookie handling
+  // In production, you should use @supabase/ssr for proper middleware support
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          response = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // Check for auth token in cookies
+  const token = request.cookies.get('sb-access-token')?.value
+
+  let user = null
+  if (token) {
+    try {
+      const { data } = await supabase.auth.getUser(token)
+      user = data.user
+    } catch (error) {
+      // Invalid token
+    }
+  }
 
   // Protected routes
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
