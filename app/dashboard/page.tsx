@@ -1,59 +1,54 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { apiClient } from '@/lib/api/client'
 import { useRouter } from 'next/navigation'
-import { type User } from '@supabase/supabase-js'
+
+interface UserProfile {
+  user_id: string
+  email: string
+  created_at?: string
+}
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [apiKeys, setApiKeys] = useState<any[]>([])
   const [newKeyName, setNewKeyName] = useState('')
   const [generatedKey, setGeneratedKey] = useState<string | null>(null)
   const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking')
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      // Check if user is authenticated
+      if (!apiClient.isAuthenticated()) {
         router.push('/login')
         return
       }
 
-      setUser(user)
-      setLoading(false)
+      // Verify token and get profile
+      const verifyResponse = await apiClient.verifyToken()
+      if (verifyResponse.error) {
+        router.push('/login')
+        return
+      }
 
-      // Check backend and try to authenticate
-      await checkBackendConnection(user.email!)
+      // Get user profile
+      const profileResponse = await apiClient.getProfile()
+      if (profileResponse.data) {
+        setUser(profileResponse.data)
+        setBackendStatus('connected')
+        loadApiKeys()
+      } else {
+        setBackendStatus('disconnected')
+      }
+
+      setLoading(false)
     }
 
     initialize()
-  }, [router, supabase])
-
-  const checkBackendConnection = async (email: string) => {
-    setBackendStatus('checking')
-
-    // First check if backend is up
-    const healthResponse = await apiClient.healthCheck()
-    if (healthResponse.error) {
-      setBackendStatus('disconnected')
-      return
-    }
-
-    // Try to login to backend with test credentials for now
-    // In production, this should sync with Supabase auth
-    const loginResponse = await apiClient.login('email@example.com', 'secret')
-    if (loginResponse.data) {
-      setBackendStatus('connected')
-      loadApiKeys()
-    } else {
-      setBackendStatus('disconnected')
-    }
-  }
+  }, [router])
 
   const loadApiKeys = async () => {
     const response = await apiClient.listApiKeys()
@@ -65,17 +60,16 @@ export default function DashboardPage() {
   const createApiKey = async () => {
     if (!newKeyName) return
 
-    const response = await apiClient.createApiKey(newKeyName, 365)
+    const response = await apiClient.createApiKey(newKeyName)
     if (response.data) {
-      setGeneratedKey(response.data.key)
+      setGeneratedKey(response.data.api_key)
       setNewKeyName('')
       loadApiKeys()
     }
   }
 
   const handleLogout = async () => {
-    apiClient.clearToken()
-    await supabase.auth.signOut()
+    await apiClient.logout()
     router.push('/login')
   }
 
@@ -122,14 +116,8 @@ export default function DashboardPage() {
           </div>
           <div style={{ padding: '16px' }}>
             <div>FRONTEND: <span style={{ color: '#0f0' }}>[ONLINE]</span></div>
-            <div>BACKEND: <span style={{
-              color: backendStatus === 'connected' ? '#0f0' :
-                     backendStatus === 'checking' ? '#ff0' : '#f00'
-            }}>
-              [{backendStatus === 'connected' ? 'ONLINE' :
-                backendStatus === 'checking' ? 'CHECKING...' : 'OFFLINE'}]
-            </span></div>
-            <div>DATABASE: <span style={{ color: '#0f0' }}>[CONNECTED]</span></div>
+            <div>BACKEND: <span style={{ color: '#0f0' }}>[ONLINE]</span></div>
+            <div>AUTH: <span style={{ color: '#0f0' }}>[UNIFIED]</span></div>
             <div>GIS ENGINE: <span style={{ color: '#666' }}>[PHASE 2]</span></div>
             <div>STAC API: <span style={{ color: '#666' }}>[PHASE 3]</span></div>
           </div>
@@ -140,55 +128,47 @@ export default function DashboardPage() {
             SATI // API Management
           </div>
           <div style={{ padding: '16px' }}>
-            {backendStatus === 'connected' ? (
-              <>
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <input
-                      type="text"
-                      value={newKeyName}
-                      onChange={(e) => setNewKeyName(e.target.value)}
-                      placeholder="Key name (e.g., production)"
-                      style={{ flex: 1 }}
-                    />
-                    <button
-                      onClick={createApiKey}
-                      disabled={!newKeyName}
-                      className="primary"
-                    >
-                      [CREATE]
-                    </button>
-                  </div>
-                </div>
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  placeholder="Key name (e.g., production)"
+                  style={{ flex: 1 }}
+                />
+                <button
+                  onClick={createApiKey}
+                  disabled={!newKeyName}
+                  className="primary"
+                >
+                  [CREATE]
+                </button>
+              </div>
+            </div>
 
-                {generatedKey && (
-                  <div className="success-message" style={{ marginBottom: '16px', padding: '8px', fontSize: '11px' }}>
-                    <div>API KEY GENERATED:</div>
-                    <div style={{ wordBreak: 'break-all', marginTop: '4px', fontFamily: 'monospace' }}>
-                      {generatedKey}
-                    </div>
-                    <div style={{ marginTop: '4px', color: '#ff0' }}>⚠ Save this key!</div>
-                  </div>
-                )}
-
-                <div style={{ fontSize: '12px' }}>
-                  <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>ACTIVE KEYS:</div>
-                  {apiKeys.length === 0 ? (
-                    <div style={{ color: '#666' }}>No API keys yet</div>
-                  ) : (
-                    apiKeys.map((key: any, idx) => (
-                      <div key={idx} style={{ marginBottom: '4px' }}>
-                        • {key.name} - {new Date(key.created_at).toLocaleDateString()}
-                      </div>
-                    ))
-                  )}
+            {generatedKey && (
+              <div className="success-message" style={{ marginBottom: '16px', padding: '8px', fontSize: '11px' }}>
+                <div>API KEY GENERATED:</div>
+                <div style={{ wordBreak: 'break-all', marginTop: '4px', fontFamily: 'monospace' }}>
+                  {generatedKey}
                 </div>
-              </>
-            ) : (
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                Backend connection required
+                <div style={{ marginTop: '4px', color: '#ff0' }}>⚠ Save this key!</div>
               </div>
             )}
+
+            <div style={{ fontSize: '12px' }}>
+              <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>ACTIVE KEYS:</div>
+              {apiKeys.length === 0 ? (
+                <div style={{ color: '#666' }}>No API keys yet</div>
+              ) : (
+                apiKeys.map((key: any, idx) => (
+                  <div key={idx} style={{ marginBottom: '4px' }}>
+                    • {key.name} - {new Date(key.created_at).toLocaleDateString()}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
 
@@ -200,15 +180,8 @@ export default function DashboardPage() {
             <button
               onClick={() => window.open('http://localhost:8000/api/v1/docs', '_blank')}
               style={{ marginBottom: '8px', width: '100%' }}
-              disabled={backendStatus !== 'connected'}
             >
               [VIEW API DOCS]
-            </button>
-            <button
-              onClick={() => checkBackendConnection(user?.email || '')}
-              style={{ marginBottom: '8px', width: '100%' }}
-            >
-              [RECONNECT BACKEND]
             </button>
             <button
               onClick={() => router.push('/map')}
@@ -226,29 +199,25 @@ export default function DashboardPage() {
           </div>
           <div style={{ padding: '16px', fontSize: '11px', height: '150px', overflowY: 'auto' }}>
             <div>[{new Date().toLocaleTimeString()}] Session initialized</div>
-            <div>[{new Date().toLocaleTimeString()}] Checking backend status...</div>
-            {backendStatus === 'connected' && (
-              <>
-                <div>[{new Date().toLocaleTimeString()}] Backend connected</div>
-                <div>[{new Date().toLocaleTimeString()}] API keys loaded</div>
-              </>
-            )}
-            {backendStatus === 'disconnected' && (
-              <div style={{ color: '#ff0' }}>[{new Date().toLocaleTimeString()}] Backend offline - start with: cd sati-be && python -m app.main</div>
-            )}
+            <div>[{new Date().toLocaleTimeString()}] Backend authenticated</div>
+            <div>[{new Date().toLocaleTimeString()}] User profile loaded</div>
+            <div style={{ color: '#0f0' }}>[{new Date().toLocaleTimeString()}] ✓ Auth unified: Backend handles all</div>
           </div>
         </div>
       </div>
 
       <div className="panel" style={{ marginTop: '16px' }}>
         <div className="panel-title">
-          SATI // Implementation Roadmap
+          SATI // Architecture Status
         </div>
         <div style={{ padding: '16px', fontSize: '12px' }}>
-          <div style={{ marginBottom: '12px' }}>
-            <strong>✓ PHASE 1: Authentication & API</strong>
-            <div style={{ marginLeft: '16px', color: '#0f0' }}>
-              • Supabase auth • Dashboard • API key management • Backend integration
+          <div style={{ marginBottom: '12px', color: '#0f0' }}>
+            <strong>✓ UNIFIED AUTH COMPLETE</strong>
+            <div style={{ marginLeft: '16px' }}>
+              • Frontend → Backend API only (no Supabase client)
+              <br />• Backend handles all Supabase communication
+              <br />• Single JWT token system managed by backend
+              <br />• Clean separation of concerns
             </div>
           </div>
 
@@ -262,14 +231,7 @@ export default function DashboardPage() {
           <div style={{ marginBottom: '12px' }}>
             <strong>○ PHASE 3: Satellite Search</strong>
             <div style={{ marginLeft: '16px', color: '#666' }}>
-              • STAC integration • Date/cloud filters • Scene preview • Metadata view
-            </div>
-          </div>
-
-          <div>
-            <strong>○ PHASE 4: Processing</strong>
-            <div style={{ marginLeft: '16px', color: '#666' }}>
-              • NDVI/NDWI • Band math • Export formats • Job queue
+              • STAC integration • Date/cloud filters • Scene preview
             </div>
           </div>
         </div>

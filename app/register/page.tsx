@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { apiClient } from '@/lib/api/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -13,7 +13,6 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,26 +30,13 @@ export default function RegisterPage() {
 
     setLoading(true)
 
-    try {
-      const { error, data } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
-        },
-      })
+    const response = await apiClient.register(email, password)
 
-      if (error) {
-        setError(error.message)
-      } else if (data?.user?.identities?.length === 0) {
-        setError('User already exists')
-      } else {
-        setSuccess(true)
-      }
-    } catch (err) {
-      setError('An unexpected error occurred')
-    } finally {
+    if (response.error) {
+      setError(response.error)
       setLoading(false)
+    } else {
+      setSuccess(true)
     }
   }
 

@@ -9,25 +9,34 @@ interface LoginRequest {
   password: string
 }
 
+interface RegisterRequest {
+  email: string
+  password: string
+}
+
 interface TokenResponse {
   access_token: string
   token_type: string
+  expires_in: number
 }
 
 interface UserProfile {
-  id: string
+  user_id: string
   email: string
   created_at?: string
 }
 
 interface ApiKeyRequest {
   name: string
+  description?: string
   expires_in_days?: number
 }
 
 interface ApiKeyResponse {
-  key: string
+  key_id: string
+  api_key: string
   name: string
+  description?: string
   created_at: string
   expires_at?: string
 }
@@ -53,7 +62,7 @@ class ApiClient {
       ...options.headers,
     }
 
-    if (this.token) {
+    if (this.token && endpoint !== '/auth/login' && endpoint !== '/auth/register') {
       headers['Authorization'] = `Bearer ${this.token}`
     }
 
@@ -95,25 +104,64 @@ class ApiClient {
       this.token = response.data.access_token
       if (typeof window !== 'undefined') {
         localStorage.setItem('api_token', response.data.access_token)
+        localStorage.setItem('user_email', email)
       }
     }
 
     return response
   }
 
+  async register(email: string, password: string): Promise<ApiResponse<TokenResponse>> {
+    const response = await this.request<TokenResponse>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+
+    if (response.data?.access_token) {
+      this.token = response.data.access_token
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('api_token', response.data.access_token)
+        localStorage.setItem('user_email', email)
+      }
+    }
+
+    return response
+  }
+
+  async logout(): Promise<ApiResponse<any>> {
+    const response = await this.request('/auth/logout', {
+      method: 'POST',
+    })
+
+    // Clear token regardless of response
+    this.clearToken()
+
+    return response
+  }
+
+  async verifyToken(): Promise<ApiResponse<any>> {
+    return this.request('/auth/verify')
+  }
+
   async getProfile(): Promise<ApiResponse<UserProfile>> {
     return this.request<UserProfile>('/auth/profile')
   }
 
-  async createApiKey(name: string, expiresInDays?: number): Promise<ApiResponse<ApiKeyResponse>> {
+  async createApiKey(name: string, description?: string): Promise<ApiResponse<ApiKeyResponse>> {
     return this.request<ApiKeyResponse>('/auth/api-keys', {
       method: 'POST',
-      body: JSON.stringify({ name, expires_in_days: expiresInDays }),
+      body: JSON.stringify({ name, description, expires_in_days: 365 }),
     })
   }
 
   async listApiKeys(): Promise<ApiResponse<any[]>> {
     return this.request<any[]>('/auth/api-keys')
+  }
+
+  async deleteApiKey(keyId: string): Promise<ApiResponse<any>> {
+    return this.request(`/auth/api-keys/${keyId}`, {
+      method: 'DELETE',
+    })
   }
 
   // Health check
@@ -126,12 +174,21 @@ class ApiClient {
     this.token = null
     if (typeof window !== 'undefined') {
       localStorage.removeItem('api_token')
+      localStorage.removeItem('user_email')
     }
   }
 
   // Check if user is authenticated
   isAuthenticated(): boolean {
     return !!this.token
+  }
+
+  // Get current user email from localStorage
+  getCurrentUserEmail(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('user_email')
+    }
+    return null
   }
 }
 
@@ -142,6 +199,7 @@ export const apiClient = new ApiClient()
 export type {
   ApiResponse,
   LoginRequest,
+  RegisterRequest,
   TokenResponse,
   UserProfile,
   ApiKeyRequest,
