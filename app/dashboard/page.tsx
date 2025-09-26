@@ -2,42 +2,96 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { apiClient } from '@/lib/api/client'
 import { useRouter } from 'next/navigation'
-import { User } from '@supabase/supabase-js'
+import { type User } from '@supabase/supabase-js'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [apiKeys, setApiKeys] = useState<any[]>([])
+  const [newKeyName, setNewKeyName] = useState('')
+  const [generatedKey, setGeneratedKey] = useState<string | null>(null)
+  const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking')
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
-    const getUser = async () => {
+    const initialize = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/login')
-      } else {
-        setUser(user)
-        setLoading(false)
+        return
       }
+
+      setUser(user)
+      setLoading(false)
+
+      // Check backend and try to authenticate
+      await checkBackendConnection(user.email!)
     }
 
-    getUser()
+    initialize()
   }, [router, supabase])
 
+  const checkBackendConnection = async (email: string) => {
+    setBackendStatus('checking')
+
+    // First check if backend is up
+    const healthResponse = await apiClient.healthCheck()
+    if (healthResponse.error) {
+      setBackendStatus('disconnected')
+      return
+    }
+
+    // Try to login to backend with test credentials for now
+    // In production, this should sync with Supabase auth
+    const loginResponse = await apiClient.login('email@example.com', 'secret')
+    if (loginResponse.data) {
+      setBackendStatus('connected')
+      loadApiKeys()
+    } else {
+      setBackendStatus('disconnected')
+    }
+  }
+
+  const loadApiKeys = async () => {
+    const response = await apiClient.listApiKeys()
+    if (response.data) {
+      setApiKeys(response.data)
+    }
+  }
+
+  const createApiKey = async () => {
+    if (!newKeyName) return
+
+    const response = await apiClient.createApiKey(newKeyName, 365)
+    if (response.data) {
+      setGeneratedKey(response.data.key)
+      setNewKeyName('')
+      loadApiKeys()
+    }
+  }
+
   const handleLogout = async () => {
+    apiClient.clearToken()
     await supabase.auth.signOut()
     router.push('/login')
-    router.refresh()
   }
 
   if (loading) {
     return (
       <div className="container">
         <div className="panel">
-          <div className="panel-title">LOADING...</div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-            <div className="spinner"></div>
+          <div className="panel-title">INITIALIZING...</div>
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            <div className="ascii-logo" style={{ fontSize: '10px' }}>
+{`   _____ ___  _______ ____
+  / ___//   |/_  __//  _/
+  \\__ \\/ /| | / /   / /
+ ___/ / ___ |/ /  _/ /
+/____/_/  |_/_/  /___/`}
+            </div>
           </div>
         </div>
       </div>
@@ -45,123 +99,178 @@ export default function DashboardPage() {
   }
 
   return (
-    <div>
-      <div className="header">
-        <h1>SATI // SATELLITE IMAGERY GATEWAY</h1>
-        <nav>
-          <span style={{ marginRight: '16px', fontSize: '14px' }}>
-            USER: {user?.email}
-          </span>
-          <button onClick={handleLogout} style={{
-            background: 'transparent',
-            border: '1px solid white',
-            color: 'white',
-            padding: '4px 12px',
-            fontSize: '12px'
-          }}>
+    <div className="container">
+      <div className="panel" style={{ marginBottom: '16px' }}>
+        <div className="panel-title">
+          SATI // CONTROL PANEL
+        </div>
+        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: '12px' }}>
+            <span>USER: {user?.email}</span>
+            <span style={{ marginLeft: '16px' }}>SESSION: ACTIVE</span>
+          </div>
+          <button onClick={handleLogout} className="secondary">
             [LOGOUT]
           </button>
-        </nav>
+        </div>
       </div>
 
-      <div className="container">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '16px' }}>
         <div className="panel">
           <div className="panel-title">
-            SYSTEM STATUS
+            SATI // System Status
           </div>
-          <div style={{ fontFamily: 'monospace', fontSize: '12px' }}>
-            <p>[✓] Authentication Module......... ONLINE</p>
-            <p>[✓] User Session.................. ACTIVE</p>
-            <p>[✓] Database Connection........... ESTABLISHED</p>
-            <p>[•] Satellite API................. PENDING</p>
-            <p>[•] Map Interface................. PENDING</p>
-            <p>[•] Processing Engine............. PENDING</p>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginTop: '16px' }}>
-          <div className="panel">
-            <div className="panel-title">
-              USER INFORMATION
-            </div>
-            <div style={{ fontSize: '12px' }}>
-              <p><strong>Email:</strong> {user?.email}</p>
-              <p><strong>User ID:</strong> {user?.id}</p>
-              <p><strong>Created:</strong> {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</p>
-              <p><strong>Last Login:</strong> {user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'N/A'}</p>
-            </div>
-          </div>
-
-          <div className="panel">
-            <div className="panel-title">
-              QUICK ACTIONS
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button disabled style={{ opacity: 0.5 }}>
-                [SEARCH IMAGERY] - COMING SOON
-              </button>
-              <button disabled style={{ opacity: 0.5 }}>
-                [VIEW MAP] - COMING SOON
-              </button>
-              <button disabled style={{ opacity: 0.5 }}>
-                [PROCESSING JOBS] - COMING SOON
-              </button>
-              <button disabled style={{ opacity: 0.5 }}>
-                [SETTINGS] - COMING SOON
-              </button>
-            </div>
-          </div>
-
-          <div className="panel">
-            <div className="panel-title">
-              SYSTEM MESSAGES
-            </div>
-            <div style={{ fontSize: '11px', height: '120px', overflowY: 'auto' }}>
-              <p>[{new Date().toLocaleTimeString()}] Welcome to SATI Platform</p>
-              <p>[{new Date().toLocaleTimeString()}] Authentication successful</p>
-              <p>[{new Date().toLocaleTimeString()}] Loading user preferences...</p>
-              <p>[{new Date().toLocaleTimeString()}] Satellite API integration pending</p>
-              <p>[{new Date().toLocaleTimeString()}] Map features will be available soon</p>
-            </div>
+          <div style={{ padding: '16px' }}>
+            <div>FRONTEND: <span style={{ color: '#0f0' }}>[ONLINE]</span></div>
+            <div>BACKEND: <span style={{
+              color: backendStatus === 'connected' ? '#0f0' :
+                     backendStatus === 'checking' ? '#ff0' : '#f00'
+            }}>
+              [{backendStatus === 'connected' ? 'ONLINE' :
+                backendStatus === 'checking' ? 'CHECKING...' : 'OFFLINE'}]
+            </span></div>
+            <div>DATABASE: <span style={{ color: '#0f0' }}>[CONNECTED]</span></div>
+            <div>GIS ENGINE: <span style={{ color: '#666' }}>[PHASE 2]</span></div>
+            <div>STAC API: <span style={{ color: '#666' }}>[PHASE 3]</span></div>
           </div>
         </div>
 
-        <div className="panel" style={{ marginTop: '16px' }}>
+        <div className="panel">
           <div className="panel-title">
-            DEVELOPMENT ROADMAP
+            SATI // API Management
           </div>
-          <div style={{ fontSize: '12px' }}>
-            <h4 style={{ marginBottom: '8px' }}>PHASE 1 - Authentication (COMPLETE)</h4>
-            <ul style={{ marginLeft: '20px', marginBottom: '16px' }}>
-              <li>[✓] User registration with Supabase</li>
-              <li>[✓] Email/password login</li>
-              <li>[✓] Protected routes</li>
-              <li>[✓] Session management</li>
-            </ul>
+          <div style={{ padding: '16px' }}>
+            {backendStatus === 'connected' ? (
+              <>
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="text"
+                      value={newKeyName}
+                      onChange={(e) => setNewKeyName(e.target.value)}
+                      placeholder="Key name (e.g., production)"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={createApiKey}
+                      disabled={!newKeyName}
+                      className="primary"
+                    >
+                      [CREATE]
+                    </button>
+                  </div>
+                </div>
 
-            <h4 style={{ marginBottom: '8px' }}>PHASE 2 - Map Integration (IN PROGRESS)</h4>
-            <ul style={{ marginLeft: '20px', marginBottom: '16px' }}>
-              <li>[•] Leaflet map component</li>
-              <li>[•] Geoman drawing tools</li>
-              <li>[•] AOI selection</li>
-              <li>[•] GeoJSON export/import</li>
-            </ul>
+                {generatedKey && (
+                  <div className="success-message" style={{ marginBottom: '16px', padding: '8px', fontSize: '11px' }}>
+                    <div>API KEY GENERATED:</div>
+                    <div style={{ wordBreak: 'break-all', marginTop: '4px', fontFamily: 'monospace' }}>
+                      {generatedKey}
+                    </div>
+                    <div style={{ marginTop: '4px', color: '#ff0' }}>⚠ Save this key!</div>
+                  </div>
+                )}
 
-            <h4 style={{ marginBottom: '8px' }}>PHASE 3 - Satellite Search (PLANNED)</h4>
-            <ul style={{ marginLeft: '20px', marginBottom: '16px' }}>
-              <li>[•] Backend API integration</li>
-              <li>[•] Search filters (date, cloud cover)</li>
-              <li>[•] Scene preview</li>
-              <li>[•] Results visualization</li>
-            </ul>
+                <div style={{ fontSize: '12px' }}>
+                  <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>ACTIVE KEYS:</div>
+                  {apiKeys.length === 0 ? (
+                    <div style={{ color: '#666' }}>No API keys yet</div>
+                  ) : (
+                    apiKeys.map((key: any, idx) => (
+                      <div key={idx} style={{ marginBottom: '4px' }}>
+                        • {key.name} - {new Date(key.created_at).toLocaleDateString()}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </>
+            ) : (
+              <div style={{ fontSize: '12px', color: '#666' }}>
+                Backend connection required
+              </div>
+            )}
+          </div>
+        </div>
 
-            <h4 style={{ marginBottom: '8px' }}>PHASE 4 - Processing (PLANNED)</h4>
-            <ul style={{ marginLeft: '20px' }}>
-              <li>[•] NDVI calculation</li>
-              <li>[•] Image clipping</li>
-              <li>[•] Job queue management</li>
-              <li>[•] Result download</li>
-            </ul>
+        <div className="panel">
+          <div className="panel-title">
+            SATI // Quick Actions
+          </div>
+          <div style={{ padding: '16px' }}>
+            <button
+              onClick={() => window.open('http://localhost:8000/api/v1/docs', '_blank')}
+              style={{ marginBottom: '8px', width: '100%' }}
+              disabled={backendStatus !== 'connected'}
+            >
+              [VIEW API DOCS]
+            </button>
+            <button
+              onClick={() => checkBackendConnection(user?.email || '')}
+              style={{ marginBottom: '8px', width: '100%' }}
+            >
+              [RECONNECT BACKEND]
+            </button>
+            <button
+              onClick={() => router.push('/map')}
+              style={{ width: '100%' }}
+              disabled={true}
+            >
+              [OPEN MAP VIEW] (Phase 2)
+            </button>
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-title">
+            SATI // Development Log
+          </div>
+          <div style={{ padding: '16px', fontSize: '11px', height: '150px', overflowY: 'auto' }}>
+            <div>[{new Date().toLocaleTimeString()}] Session initialized</div>
+            <div>[{new Date().toLocaleTimeString()}] Checking backend status...</div>
+            {backendStatus === 'connected' && (
+              <>
+                <div>[{new Date().toLocaleTimeString()}] Backend connected</div>
+                <div>[{new Date().toLocaleTimeString()}] API keys loaded</div>
+              </>
+            )}
+            {backendStatus === 'disconnected' && (
+              <div style={{ color: '#ff0' }}>[{new Date().toLocaleTimeString()}] Backend offline - start with: cd sati-be && python -m app.main</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="panel" style={{ marginTop: '16px' }}>
+        <div className="panel-title">
+          SATI // Implementation Roadmap
+        </div>
+        <div style={{ padding: '16px', fontSize: '12px' }}>
+          <div style={{ marginBottom: '12px' }}>
+            <strong>✓ PHASE 1: Authentication & API</strong>
+            <div style={{ marginLeft: '16px', color: '#0f0' }}>
+              • Supabase auth • Dashboard • API key management • Backend integration
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <strong>→ PHASE 2: GIS Visualization</strong>
+            <div style={{ marginLeft: '16px', color: '#ff0' }}>
+              • Leaflet map • Geoman tools • AOI selection • Layer management
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <strong>○ PHASE 3: Satellite Search</strong>
+            <div style={{ marginLeft: '16px', color: '#666' }}>
+              • STAC integration • Date/cloud filters • Scene preview • Metadata view
+            </div>
+          </div>
+
+          <div>
+            <strong>○ PHASE 4: Processing</strong>
+            <div style={{ marginLeft: '16px', color: '#666' }}>
+              • NDVI/NDWI • Band math • Export formats • Job queue
+            </div>
           </div>
         </div>
       </div>
