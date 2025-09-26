@@ -1,8 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { imageryApi, Collection, SearchResponse, Scene } from '@/lib/api/imagery'
 import { useAuth } from '@/hooks/useAuth'
+
+// Dynamic import to avoid SSR issues with Leaflet
+const ImageryMap = dynamic(() => import('@/components/Map/ImageryMap'), {
+  ssr: false,
+  loading: () => <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading map...</div>
+})
 
 export default function ImageryPage() {
   const { isLoading, isAuthenticated, handleAuthError } = useAuth(true)
@@ -16,6 +23,8 @@ export default function ImageryPage() {
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [searchMode, setSearchMode] = useState<'bbox' | 'polygon'>('bbox')
+  const [drawnPolygon, setDrawnPolygon] = useState<GeoJSON.Polygon | null>(null)
 
   // Simple bbox for demo (covers interesting area)
   const defaultBbox: [number, number, number, number] = [-10, 35, 30, 60] // Europe
@@ -39,19 +48,37 @@ export default function ImageryPage() {
     }
   }
 
+  const handlePolygonDrawn = (polygon: GeoJSON.Polygon) => {
+    setDrawnPolygon(polygon)
+    setSearchMode('polygon')
+  }
+
   const handleSearch = async () => {
+    if (searchMode === 'polygon' && !drawnPolygon) {
+      setError('Please draw a polygon on the map first')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
     try {
-      const results = await imageryApi.search({
-        bbox: defaultBbox,
+      const searchParams: any = {
         date_from: dateFrom,
         date_to: dateTo,
         collections: [selectedCollection],
         cloud_cover_max: cloudCover,
         limit: 20,
-      })
+      }
+
+      // Use polygon or bbox depending on mode
+      if (searchMode === 'polygon' && drawnPolygon) {
+        searchParams.geometry = drawnPolygon
+      } else {
+        searchParams.bbox = defaultBbox
+      }
+
+      const results = await imageryApi.search(searchParams)
       setSearchResults(results)
     } catch (err: any) {
       // Check if it's an auth error
@@ -217,15 +244,28 @@ export default function ImageryPage() {
         </div>
       </div>
 
+      {/* Map Panel */}
+      <div className="panel" style={{ marginTop: '16px' }}>
+        <div className="panel-title">SATI // Area Selection</div>
+        <div style={{ padding: '16px' }}>
+          <div style={{ marginBottom: '12px', fontSize: '12px' }}>
+            <div style={{ marginBottom: '8px' }}>
+              SEARCH MODE: {searchMode === 'polygon' ? '[POLYGON DRAWN]' : '[DEFAULT BBOX]'}
+            </div>
+            <div style={{ color: '#666' }}>
+              Use polygon tool to draw custom search area or use default Europe bbox
+            </div>
+          </div>
+          <ImageryMap onPolygonDrawn={handlePolygonDrawn} />
+        </div>
+      </div>
+
       {/* Info Panel */}
       <div className="panel" style={{ marginTop: '16px' }}>
-        <div className="panel-title">SATI // Search Info</div>
+        <div className="panel-title">SATI // Data Info</div>
         <div style={{ padding: '16px', fontSize: '12px' }}>
           <div style={{ marginBottom: '8px' }}>
             <strong>Data Source:</strong> AWS Earth Search (STAC API)
-          </div>
-          <div style={{ marginBottom: '8px' }}>
-            <strong>Coverage:</strong> Europe (demo bbox)
           </div>
           <div style={{ marginBottom: '8px' }}>
             <strong>Available Collections:</strong>
@@ -234,9 +274,6 @@ export default function ImageryPage() {
               <li>Landsat 8/9 Collection 2 (30m resolution)</li>
               <li>Copernicus DEM (30m elevation)</li>
             </ul>
-          </div>
-          <div style={{ color: '#ff0' }}>
-            ⚠️ Map drawing coming in next iteration
           </div>
         </div>
       </div>
