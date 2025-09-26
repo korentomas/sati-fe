@@ -28,11 +28,18 @@ export default function LayerControl({ layers, onLayerUpdate, onLayerRemove }: L
         fontSize: '12px',
       }}
     >
-      <div style={{ fontWeight: 'bold', marginBottom: '8px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>
+      <div
+        style={{
+          fontWeight: 'bold',
+          marginBottom: '8px',
+          borderBottom: '1px solid #333',
+          paddingBottom: '4px',
+        }}
+      >
         LAYERS [{layers.length}]
       </div>
 
-      {layers.map(layer => (
+      {layers.map((layer) => (
         <div
           key={layer.id}
           style={{
@@ -48,7 +55,15 @@ export default function LayerControl({ layers, onLayerUpdate, onLayerRemove }: L
               onChange={(e) => onLayerUpdate(layer.id, { visible: e.target.checked })}
               style={{ marginRight: '6px' }}
             />
-            <span style={{ flex: 1, fontWeight: 'bold', fontSize: '11px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span
+              style={{
+                flex: 1,
+                fontWeight: 'bold',
+                fontSize: '11px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {layer.name}
             </span>
             <button

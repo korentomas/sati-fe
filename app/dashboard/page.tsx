@@ -15,12 +15,12 @@ export default function DashboardPage() {
   const { isLoading: authLoading, isAuthenticated, handleAuthError } = useAuth(true)
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [apiKeys, setApiKeys] = useState<Array<{ key_id: string; name: string; created_at: string }>>([])
+  const [apiKeys, setApiKeys] = useState<
+    Array<{ key_id: string; name: string; created_at: string }>
+  >([])
   const [newKeyName, setNewKeyName] = useState('')
   const [generatedKey, setGeneratedKey] = useState<string | null>(null)
-  const [, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>(
-    'checking'
-  )
+  const [, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking')
   const router = useRouter()
 
   useEffect(() => {

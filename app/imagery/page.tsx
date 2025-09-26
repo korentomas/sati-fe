@@ -9,7 +9,13 @@ import type { ImageryLayer } from '@/components/Map/ImageryMap'
 // Dynamic import to avoid SSR issues with Leaflet
 const ImageryMap = dynamic(() => import('@/components/Map/ImageryMap'), {
   ssr: false,
-  loading: () => <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading map...</div>
+  loading: () => (
+    <div
+      style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
+      Loading map...
+    </div>
+  ),
 })
 
 export default function ImageryPage() {
@@ -100,7 +106,7 @@ export default function ImageryPage() {
 
   const handleAddToMap = (scene: Scene) => {
     // Check if layer already exists
-    const existingLayer = mapLayers.find(l => l.id === scene.id)
+    const existingLayer = mapLayers.find((l) => l.id === scene.id)
     if (existingLayer) {
       // Toggle visibility if layer exists
       handleLayerUpdate(scene.id, { visible: !existingLayer.visible })
@@ -137,23 +143,25 @@ export default function ImageryPage() {
       url: tileUrl,
       opacity: 0.8,
       visible: true,
-      bounds: scene.bbox ? [
-        [scene.bbox[1], scene.bbox[0]],
-        [scene.bbox[3], scene.bbox[2]]
-      ] : undefined
+      bounds: scene.bbox
+        ? [
+            [scene.bbox[1], scene.bbox[0]],
+            [scene.bbox[3], scene.bbox[2]],
+          ]
+        : undefined,
     }
 
     setMapLayers([...mapLayers, newLayer])
   }
 
   const handleLayerUpdate = useCallback((layerId: string, updates: Partial<ImageryLayer>) => {
-    setMapLayers(prev => prev.map(layer =>
-      layer.id === layerId ? { ...layer, ...updates } : layer
-    ))
+    setMapLayers((prev) =>
+      prev.map((layer) => (layer.id === layerId ? { ...layer, ...updates } : layer))
+    )
   }, [])
 
   const handleLayerRemove = useCallback((layerId: string) => {
-    setMapLayers(prev => prev.filter(layer => layer.id !== layerId))
+    setMapLayers((prev) => prev.filter((layer) => layer.id !== layerId))
   }, [])
 
   // Show loading while checking auth
@@ -308,15 +316,15 @@ export default function ImageryPage() {
                         fontSize: '12px',
                       }}
                     >
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px' }}>
+                      <div
+                        style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px' }}
+                      >
                         <div>
                           <div style={{ color: '#0f0', marginBottom: '4px', fontSize: '11px' }}>
                             {scene.collection}/{scene.id}
                           </div>
                           <div>Date: {formatDate(scene.properties.datetime)}</div>
-                          <div>
-                            Cloud: {scene.properties.cloud_cover?.toFixed(1) || 'N/A'}%
-                          </div>
+                          <div>Cloud: {scene.properties.cloud_cover?.toFixed(1) || 'N/A'}%</div>
                           {scene.properties.platform && (
                             <div>Platform: {scene.properties.platform}</div>
                           )}
@@ -326,13 +334,15 @@ export default function ImageryPage() {
                               marginTop: '8px',
                               padding: '4px 8px',
                               fontSize: '11px',
-                              background: mapLayers.find(l => l.id === scene.id) ? '#008000' : '#000080',
+                              background: mapLayers.find((l) => l.id === scene.id)
+                                ? '#008000'
+                                : '#000080',
                               color: '#fff',
                               border: '1px solid #333',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
                             }}
                           >
-                            {mapLayers.find(l => l.id === scene.id) ? '[ON MAP]' : '[ADD TO MAP]'}
+                            {mapLayers.find((l) => l.id === scene.id) ? '[ON MAP]' : '[ADD TO MAP]'}
                           </button>
                         </div>
                         {scene.thumbnail_url && (
@@ -344,7 +354,7 @@ export default function ImageryPage() {
                               height: '80px',
                               objectFit: 'cover',
                               border: '1px solid #666',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
                             }}
                             onClick={() => handleAddToMap(scene)}
                           />
@@ -395,7 +405,7 @@ export default function ImageryPage() {
                 <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
                   LAYERS [{mapLayers.length}]
                 </div>
-                {mapLayers.map(layer => (
+                {mapLayers.map((layer) => (
                   <div key={layer.id} style={{ marginBottom: '8px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <input
@@ -403,7 +413,14 @@ export default function ImageryPage() {
                         checked={layer.visible}
                         onChange={(e) => handleLayerUpdate(layer.id, { visible: e.target.checked })}
                       />
-                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span
+                        style={{
+                          flex: 1,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         {layer.name}
                       </span>
                     </label>
@@ -413,7 +430,9 @@ export default function ImageryPage() {
                         min="0"
                         max="100"
                         value={layer.opacity * 100}
-                        onChange={(e) => handleLayerUpdate(layer.id, { opacity: Number(e.target.value) / 100 })}
+                        onChange={(e) =>
+                          handleLayerUpdate(layer.id, { opacity: Number(e.target.value) / 100 })
+                        }
                         style={{ width: '100%' }}
                         disabled={!layer.visible}
                       />
