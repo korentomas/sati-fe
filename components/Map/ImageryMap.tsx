@@ -137,9 +137,27 @@ const ImageryMap = memo(
                   opacity: layer.opacity,
                   attribution: `© ${layer.name}`,
                   maxZoom: 18,
+                  minZoom: 2,
                   tileSize: 256,
                   crossOrigin: true,
+                  errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', // Transparent 1x1 pixel
                 })
+
+                // Add loading and error event handlers
+                if (mapLayer) {
+                  mapLayer.on('loading', () => {
+                    console.log(`Loading tiles for ${layer.name}`)
+                  })
+
+                  mapLayer.on('load', () => {
+                    console.log(`Tiles loaded for ${layer.name}`)
+                  })
+
+                  mapLayer.on('tileerror', (error: any) => {
+                    console.warn(`Tile error for ${layer.name}:`, error.tile.src)
+                    // The errorTileUrl will be used automatically
+                  })
+                }
               } else if (layer.bounds && !layer.url.includes('{')) {
                 // Use image overlay for static images with known bounds
                 const bounds = L.latLngBounds(layer.bounds as L.LatLngBoundsExpression)
