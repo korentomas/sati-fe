@@ -148,8 +148,16 @@ export default function ImageryPage() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
       const encodedUrl = encodeURIComponent(cogUrl)
 
+      // Get auth token from localStorage
+      const token = typeof window !== 'undefined' ? localStorage.getItem('api_token') : null
+
       // Construct tile URL for our backend tile server
-      tileUrl = `${apiUrl}/imagery/tiles/{z}/{x}/{y}.png?url=${encodedUrl}&bands=1,2,3&rescale=0,3000`
+      // Include auth token as query parameter since we can't set headers on tile requests
+      if (token) {
+        tileUrl = `${apiUrl}/imagery/tiles/{z}/{x}/{y}.png?url=${encodedUrl}&bands=1,2,3&rescale=0,3000&token=${token}`
+      } else {
+        tileUrl = `${apiUrl}/imagery/tiles/{z}/{x}/{y}.png?url=${encodedUrl}&bands=1,2,3&rescale=0,3000`
+      }
 
       console.log('Using COG tile server:', tileUrl)
       console.log('COG URL:', cogUrl)
