@@ -54,6 +54,14 @@ export const imageryApi = {
   // List available collections (Sentinel-2, Landsat, etc.)
   async listCollections(): Promise<Collection[]> {
     const response = await apiClient.request<Collection[]>('/imagery/collections')
+
+    if (response.error) {
+      // Include status code in error for auth handling
+      const error = new Error(response.error) as any
+      error.status = response.status
+      throw error
+    }
+
     return response.data || []
   },
 

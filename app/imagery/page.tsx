@@ -22,23 +22,46 @@ export default function ImageryPage() {
   const defaultBbox: [number, number, number, number] = [-10, 35, 30, 60] // Europe
 
   useEffect(() => {
-    // Check authentication
-    if (!apiClient.isAuthenticated()) {
-      // Redirect to login with return URL
-      router.push('/login?from=/imagery')
-      return
+    // Check authentication and validate token
+    const initializePage = async () => {
+      // First check if we have a token at all
+      if (!apiClient.isAuthenticated()) {
+        router.push('/login?from=/imagery')
+        return
+      }
+
+      // Try to load collections to verify token is valid
+      try {
+        const cols = await imageryApi.listCollections()
+        setCollections(cols)
+      } catch (err: any) {
+        // If we get 401, token is invalid/expired
+        if (err?.status === 401 || err?.message?.includes('401')) {
+          // Clear invalid token
+          apiClient.logout()
+          // Redirect to login
+          router.push('/login?from=/imagery')
+        } else {
+          console.error('Failed to load collections:', err)
+        }
+      }
     }
 
-    // Load collections
-    loadCollections()
+    initializePage()
   }, [router])
 
   const loadCollections = async () => {
     try {
       const cols = await imageryApi.listCollections()
       setCollections(cols)
-    } catch (err) {
-      console.error('Failed to load collections:', err)
+    } catch (err: any) {
+      // Handle auth errors during refresh
+      if (err?.status === 401 || err?.message?.includes('401')) {
+        apiClient.logout()
+        router.push('/login?from=/imagery')
+      } else {
+        console.error('Failed to load collections:', err)
+      }
     }
   }
 
