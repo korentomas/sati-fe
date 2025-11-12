@@ -16,10 +16,6 @@
     "precommit": "npm run format:check && npm run type-check && npm run lint && npm run test:a11y"
   },
   "dependencies": {
-    "@supabase/auth-ui-react": "^0.4.7",
-    "@supabase/auth-ui-shared": "^0.1.8",
-    "@supabase/ssr": "^0.7.0",
-    "@supabase/supabase-js": "^2.58.0",
     "clsx": "^2.1.1",
     "next": "15.5.4",
     "react": "19.1.0",

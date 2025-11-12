@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { apiClient } from '@/lib/api/client'
 
@@ -62,7 +62,7 @@ export function useAuth(requireAuth: boolean = true) {
     checkAuth()
   }, [router, pathname, requireAuth])
 
-  const handleAuthError = (error: any) => {
+  const handleAuthError = useCallback((error: any) => {
     // Helper function for handling auth errors in API calls
     if (error?.status === 401 || error?.message?.includes('401') || error?.message?.includes('Unauthorized')) {
       apiClient.logout()
@@ -70,7 +70,7 @@ export function useAuth(requireAuth: boolean = true) {
       return true
     }
     return false
-  }
+  }, [router, pathname])
 
   return {
     ...authState,
