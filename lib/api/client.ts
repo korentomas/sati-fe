@@ -137,7 +137,8 @@ class ApiClient {
   }
 
   async verifyToken(): Promise<ApiResponse<UserProfile>> {
-    return this.request<UserProfile>('/auth/verify')
+    // Use profile endpoint to verify token validity
+    return this.request<UserProfile>('/auth/profile')
   }
 
   async getProfile(): Promise<ApiResponse<UserProfile>> {

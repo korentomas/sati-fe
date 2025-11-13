@@ -28,8 +28,6 @@ In your Vercel project settings, add these environment variables:
 NEXT_PUBLIC_API_URL=https://your-backend-api.com/api/v1
 ```
 
-**Note**: The Supabase variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) are not currently used since the backend handles all Supabase communication.
-
 ### 3. Configure Deployment Branches
 
 By default, Vercel will:

@@ -36,7 +36,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           // Token is valid
           setIsAuthenticated(true)
         }
-      } catch (error) {
+      } catch (_error) {
         // Network error or token invalid
         apiClient.logout()
         router.push(`/login?from=${encodeURIComponent(pathname)}`)

@@ -4,7 +4,7 @@ A modern GIS platform for satellite imagery search, processing, and visualizatio
 
 ## Features
 
-- **Authentication**: Secure user authentication with Supabase
+- **Authentication**: Secure user authentication with backend API (SQLAlchemy + PostgreSQL)
 - **Retro Aesthetic**: 90s/00s inspired UI design
 - **Dashboard**: User dashboard with system status
 - **Map Integration** (Coming Soon): Interactive maps with Leaflet & Geoman
@@ -14,7 +14,7 @@ A modern GIS platform for satellite imagery search, processing, and visualizatio
 ## Tech Stack
 
 - **Framework**: Next.js 15 with App Router
-- **Authentication**: Supabase Auth
+- **Authentication**: Backend API with JWT tokens
 - **Styling**: Tailwind CSS with custom retro theme
 - **Type Safety**: TypeScript
 - **CI/CD**: GitHub Actions
@@ -23,15 +23,13 @@ A modern GIS platform for satellite imagery search, processing, and visualizatio
 
 - Node.js 20.x or higher
 - npm or yarn
-- Supabase account
+- Backend API running (default: http://localhost:8000)
 
 ## Environment Variables
 
 Create a `.env.local` file in the root directory:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 ```
 
@@ -77,7 +75,7 @@ sati-fe/
 │   ├── dashboard/         # Protected dashboard
 │   └── globals.css        # Global styles with retro theme
 ├── lib/                   # Utility functions
-│   └── supabase/         # Supabase client configuration
+│   └── api/              # API client configuration
 ├── middleware.ts          # Auth middleware for protected routes
 └── .github/              # CI/CD workflows
     └── workflows/
@@ -87,11 +85,11 @@ sati-fe/
 
 ## Authentication Flow
 
-1. Users register with email/password
-2. Email verification sent via Supabase
+1. Users register with email/password via backend API
+2. Backend creates user account and returns JWT token
 3. Login redirects to dashboard
 4. Protected routes enforced by middleware
-5. Session management handled by Supabase
+5. Session management handled via JWT tokens stored in localStorage
 
 ## Deployment
 

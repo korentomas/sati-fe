@@ -24,6 +24,13 @@ export interface SceneProperties {
   gsd?: number
 }
 
+export interface SceneAsset {
+  href: string
+  type?: string
+  title?: string
+  roles?: string[]
+}
+
 export interface Scene {
   id: string
   collection: string
@@ -31,7 +38,7 @@ export interface Scene {
   geometry: GeoJSONGeometry
   properties: SceneProperties
   thumbnail_url?: string
-  assets: Record<string, any>
+  assets: Record<string, SceneAsset>
 }
 
 export interface SearchResponse {
@@ -57,7 +64,7 @@ export const imageryApi = {
 
     if (response.error) {
       // Include status code in error for auth handling
-      const error = new Error(response.error) as any
+      const error = new Error(response.error) as Error & { status?: number }
       error.status = response.status
       throw error
     }
@@ -74,7 +81,7 @@ export const imageryApi = {
 
     if (response.error) {
       // Include status code in error for auth handling
-      const error = new Error(response.error) as any
+      const error = new Error(response.error) as Error & { status?: number }
       error.status = response.status
       throw error
     }

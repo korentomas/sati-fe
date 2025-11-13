@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const { isLoading: authLoading, isAuthenticated, handleAuthError } = useAuth(true)
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
   const [apiKeys, setApiKeys] = useState<
     Array<{ key_id: string; name: string; created_at: string }>
   >([])
@@ -26,9 +27,11 @@ export default function DashboardPage() {
   useEffect(() => {
     const initialize = async () => {
       // Wait for auth check to complete
-      if (authLoading || !isAuthenticated) {
+      if (authLoading || !isAuthenticated || initialized) {
         return
       }
+
+      setInitialized(true)
 
       // Get user profile
       try {
@@ -51,7 +54,8 @@ export default function DashboardPage() {
     }
 
     initialize()
-  }, [authLoading, isAuthenticated, handleAuthError])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, isAuthenticated, initialized])
 
   const loadApiKeys = async () => {
     const response = await apiClient.listApiKeys()
@@ -242,8 +246,8 @@ export default function DashboardPage() {
           <div style={{ marginBottom: '12px', color: '#0f0' }}>
             <strong>✓ UNIFIED AUTH COMPLETE</strong>
             <div style={{ marginLeft: '16px' }}>
-              • Frontend → Backend API only (no Supabase client)
-              <br />• Backend handles all Supabase communication
+              • Frontend → Backend API only
+              <br />• Backend uses SQLAlchemy + PostgreSQL
               <br />• Single JWT token system managed by backend
               <br />• Clean separation of concerns
             </div>

@@ -6,7 +6,10 @@ import 'leaflet/dist/leaflet.css'
 import '@geoman-io/leaflet-geoman-free'
 
 // Fix Leaflet default marker icon issue
-delete (L.Icon.Default.prototype as any)._getIconUrl
+interface LeafletIconDefault extends L.Icon.Default {
+  _getIconUrl?: string
+}
+delete (L.Icon.Default.prototype as LeafletIconDefault)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
@@ -72,7 +75,7 @@ const ImageryMap = memo(
       }
 
       // Initialize Geoman controls
-      ;(map as any).pm.addControls({
+      map.pm.addControls({
         position: 'topleft',
         drawCircle: false,
         drawCircleMarker: false,
@@ -86,15 +89,19 @@ const ImageryMap = memo(
       })
 
       // Handle polygon creation
-      map.on('pm:create', (e: any) => {
-        const layer = e.layer
-        if (e.shape === 'Rectangle' || e.shape === 'Polygon') {
+      map.on('pm:create', (e) => {
+        const event = e as L.LeafletEvent & {
+          layer: L.Layer & { toGeoJSON: () => GeoJSON.Feature }
+          shape: string
+        }
+        const { layer, shape } = event
+        if (shape === 'Rectangle' || shape === 'Polygon') {
           const geoJson = layer.toGeoJSON() as GeoJSON.Feature<GeoJSON.Polygon>
           callbackRef.current(geoJson.geometry)
 
           // Remove other polygons
-          map.eachLayer((l: any) => {
-            if (l instanceof L.Polygon && l !== layer && l !== e.layer) {
+          map.eachLayer((l: L.Layer) => {
+            if (l instanceof L.Polygon && l !== layer) {
               map.removeLayer(l)
             }
           })
@@ -124,7 +131,7 @@ const ImageryMap = memo(
               // Check if it's a WMS URL
               if (layer.url.includes('WMS') || layer.url.includes('wms')) {
                 // For WMS layers, use tileLayer.wms
-                mapLayer = (L.tileLayer as any).wms(layer.url.split('?')[0], {
+                mapLayer = L.tileLayer.wms(layer.url.split('?')[0], {
                   layers: 's2cloudless_3857',
                   format: 'image/png',
                   transparent: true,
@@ -153,14 +160,17 @@ const ImageryMap = memo(
                     console.log(`Tiles loaded for ${layer.name}`)
                   })
 
-                  mapLayer.on('tileerror', (error: any) => {
+                  interface TileErrorEvent extends L.LeafletEvent {
+                    tile: { src: string }
+                  }
+                  mapLayer.on('tileerror', (error: TileErrorEvent) => {
                     console.warn(`Tile error for ${layer.name}:`, error.tile.src)
                     // The errorTileUrl will be used automatically
                   })
                 }
               } else if (layer.bounds && !layer.url.includes('{')) {
                 // Use image overlay for static images with known bounds
-                const bounds = L.latLngBounds(layer.bounds as L.LatLngBoundsExpression)
+                const bounds = L.latLngBounds(layer.bounds as L.LatLngExpression[])
 
                 // For thumbnails, we'll create a simple colored rectangle as placeholder
                 // since the actual thumbnail URLs might not be accessible
@@ -175,7 +185,7 @@ const ImageryMap = memo(
                   fillOpacity: layer.opacity * 0.2,
                 })
 
-                mapLayer = rectangle as any
+                mapLayer = rectangle
               } else {
                 // Try as generic tile layer
                 mapLayer = L.tileLayer(layer.url, {
@@ -197,13 +207,15 @@ const ImageryMap = memo(
 
         if (mapLayer) {
           // Update existing layer
-          mapLayer.setOpacity(layer.opacity)
+          if ('setOpacity' in mapLayer && typeof mapLayer.setOpacity === 'function') {
+            (mapLayer as L.TileLayer).setOpacity(layer.opacity)
+          }
 
           if (layer.visible && !map.hasLayer(mapLayer)) {
             mapLayer.addTo(map)
             // If it has bounds, fit the map to show the layer
             if (layer.bounds && layers.filter((l) => l.visible).length === 1) {
-              const bounds = L.latLngBounds(layer.bounds as L.LatLngBoundsExpression)
+              const bounds = L.latLngBounds(layer.bounds as L.LatLngExpression[])
               map.fitBounds(bounds, { padding: [50, 50] })
             }
           } else if (!layer.visible && map.hasLayer(mapLayer)) {

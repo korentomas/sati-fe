@@ -47,13 +47,13 @@ export default function RegisterPage() {
             <div className="success-message" style={{ fontSize: '14px', marginBottom: '16px' }}>
               REGISTRATION COMPLETE!
             </div>
-            <p style={{ marginBottom: '16px' }}>Please check your email to verify your account.</p>
+            <p style={{ marginBottom: '16px' }}>Your account has been created successfully.</p>
             <p style={{ fontSize: '12px', color: '#666' }}>
-              You may need to check your spam folder.
+              You can now log in with your credentials.
             </p>
             <div style={{ marginTop: '20px' }}>
               <Link href="/login">
-                <button className="primary">[RETURN TO LOGIN]</button>
+                <button className="primary">[GO TO LOGIN]</button>
               </Link>
             </div>
           </div>
