@@ -13,6 +13,31 @@
 
 /* 90s/00s Aesthetic - SATI Platform */
 :root {
+  /* Modern Theme Variables for Workspace */
+  --background: 15 15 15;
+  --foreground: 0 255 0;
+  --muted: 45 45 45;
+  --muted-foreground: 150 150 150;
+  --card: 25 25 25;
+  --card-foreground: 0 255 0;
+  --border: 60 60 60;
+  --primary: 0 255 0;
+  --primary-foreground: 0 0 0;
+  --secondary: 0 200 100;
+  --accent: 0 255 128;
+  --destructive: 255 50 50;
+  --success: 0 255 0;
+  --warning: 255 200 0;
+  --info: 0 200 255;
+
+  /* Spacing & Dimensions */
+  --radius: 4px;
+  --panel-width-left: 320px;
+  --panel-width-right: 350px;
+  --toolbar-height: 40px;
+  --statusbar-height: 25px;
+
+  /* Legacy 90s/00s styles (for existing pages) */
   --bg-main: #c0c0c0;
   --bg-panel: #ffffff;
   --border-color: #000000;
@@ -20,8 +45,21 @@
   --link-color: #0000ff;
   --link-visited: #551a8b;
   --link-hover: #ff0000;
-  --success: #008000;
+  --success-legacy: #008000;
   --error: #ff0000;
+}
+
+/* Light theme override */
+[data-theme="light"] {
+  --background: 255 255 255;
+  --foreground: 10 10 10;
+  --muted: 245 245 245;
+  --muted-foreground: 100 100 100;
+  --card: 255 255 255;
+  --card-foreground: 10 10 10;
+  --border: 230 230 230;
+  --primary: 0 120 60;
+  --primary-foreground: 255 255 255;
 }
 
 body {
