@@ -15,7 +15,7 @@ export async function checkColorContrast(html: string): Promise<AxeResults> {
     const dom = new JSDOM(html)
     const { window: win } = dom
 
-    // @ts-ignore
+    // @ts-expect-error - Global window assignment for testing
     global.window = win
     global.document = win.document
 

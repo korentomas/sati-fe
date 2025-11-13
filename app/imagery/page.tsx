@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
-import { imageryApi, Collection, SearchResponse, Scene } from '@/lib/api/imagery'
+import { imageryApi, Collection, SearchResponse, Scene, SearchRequest } from '@/lib/api/imagery'
 import { useAuth } from '@/hooks/useAuth'
 import type { ImageryLayer } from '@/components/Map/ImageryMap'
 
@@ -20,7 +20,7 @@ const ImageryMap = dynamic(() => import('@/components/Map/ImageryMap'), {
 
 export default function ImageryPage() {
   const { isLoading, isAuthenticated, handleAuthError } = useAuth(true)
-  const [collections, setCollections] = useState<Collection[]>([])
+  const [, setCollections] = useState<Collection[]>([]) // Collections loaded but not currently displayed
   const [selectedCollection, setSelectedCollection] = useState<string>('sentinel-2-l2a')
   const [dateFrom, setDateFrom] = useState<string>(
     new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -39,24 +39,24 @@ export default function ImageryPage() {
   // Simple bbox for demo (covers interesting area)
   const defaultBbox: [number, number, number, number] = [-10, 35, 30, 60] // Europe
 
-  useEffect(() => {
-    // Load collections once authenticated
-    if (isAuthenticated) {
-      loadCollections()
-    }
-  }, [isAuthenticated])
-
-  const loadCollections = async () => {
+  const loadCollections = useCallback(async () => {
     try {
       const cols = await imageryApi.listCollections()
       setCollections(cols)
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Handle auth errors
       if (!handleAuthError(err)) {
         console.error('Failed to load collections:', err)
       }
     }
-  }
+  }, [handleAuthError])
+
+  useEffect(() => {
+    // Load collections once authenticated
+    if (isAuthenticated) {
+      loadCollections()
+    }
+  }, [isAuthenticated, loadCollections])
 
   const handlePolygonDrawn = useCallback((polygon: GeoJSON.Polygon) => {
     setDrawnPolygon(polygon)
@@ -73,7 +73,7 @@ export default function ImageryPage() {
     setError(null)
 
     try {
-      const searchParams: any = {
+      const searchParams: SearchRequest = {
         date_from: dateFrom,
         date_to: dateTo,
         collections: [selectedCollection],
@@ -90,7 +90,7 @@ export default function ImageryPage() {
 
       const results = await imageryApi.search(searchParams)
       setSearchResults(results)
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Check if it's an auth error
       if (!handleAuthError(err)) {
         setError(err instanceof Error ? err.message : 'Search failed')
