@@ -16,15 +16,19 @@
     "precommit": "npm run format:check && npm run type-check && npm run lint && npm run test:a11y"
   },
   "dependencies": {
+    "@geoman-io/leaflet-geoman-free": "^2.18.3",
     "clsx": "^2.1.1",
+    "leaflet": "^1.9.4",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.8.0",
+    "@types/leaflet": "^1.9.20",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

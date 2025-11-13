@@ -22,8 +22,8 @@ export async function checkColorContrast(html: string): Promise<AxeResults> {
     return await axe.default.run(document.body, {
       rules: {
         'color-contrast': { enabled: true },
-        'color-contrast-enhanced': { enabled: true }
-      }
+        'color-contrast-enhanced': { enabled: true },
+      },
     })
   } else {
     // Client-side
@@ -31,8 +31,8 @@ export async function checkColorContrast(html: string): Promise<AxeResults> {
     return await axe.default.run(document.body, {
       rules: {
         'color-contrast': { enabled: true },
-        'color-contrast-enhanced': { enabled: true }
-      }
+        'color-contrast-enhanced': { enabled: true },
+      },
     })
   }
 }
@@ -44,8 +44,8 @@ export function AxeAccessibilityReporter() {
       axe(React, ReactDOM, 1000, {
         rules: {
           'color-contrast': { enabled: true },
-          'color-contrast-enhanced': { enabled: true }
-        }
+          'color-contrast-enhanced': { enabled: true },
+        },
       })
     })
   }

@@ -38,7 +38,7 @@ function findColorDefinitions(dir: string): Map<string, string[]> {
 
       if (stat.isDirectory() && !file.startsWith('.') && file !== 'node_modules') {
         scanDirectory(fullPath)
-      } else if (fileExtensions.some(ext => file.endsWith(ext))) {
+      } else if (fileExtensions.some((ext) => file.endsWith(ext))) {
         const content = fs.readFileSync(fullPath, 'utf-8')
 
         // Find hex colors
@@ -78,7 +78,7 @@ export function testColorPairs(): TestResult {
   const result: TestResult = {
     passed: true,
     failures: [],
-    warnings: []
+    warnings: [],
   }
 
   for (const pair of SATI_COLOR_PAIRS) {
@@ -91,12 +91,12 @@ export function testColorPairs(): TestResult {
         foreground: pair.foreground,
         background: pair.background,
         ratio: contrastResult.ratio,
-        required: 4.5
+        required: 4.5,
       })
     } else if (!contrastResult.passesAAA) {
       result.warnings.push({
         description: pair.description || 'Unnamed color pair',
-        message: contrastResult.recommendation || 'Consider improving contrast'
+        message: contrastResult.recommendation || 'Consider improving contrast',
       })
     }
   }
@@ -111,7 +111,7 @@ export function testCommonPatterns(): TestResult {
   const result: TestResult = {
     passed: true,
     failures: [],
-    warnings: []
+    warnings: [],
   }
 
   // Common SATI terminal colors
@@ -136,8 +136,16 @@ export function testCommonPatterns(): TestResult {
 
       const contrastResult = checkColorContrast(fg, bg)
       const bgName = bg === '#000000' ? 'black' : bg === '#ffffff' ? 'white' : bg
-      const fgName = fg === '#00ff00' ? 'green' : fg === '#ffff00' ? 'yellow' :
-                     fg === '#ff0000' ? 'red' : fg === '#00ffff' ? 'cyan' : fg
+      const fgName =
+        fg === '#00ff00'
+          ? 'green'
+          : fg === '#ffff00'
+            ? 'yellow'
+            : fg === '#ff0000'
+              ? 'red'
+              : fg === '#00ffff'
+                ? 'cyan'
+                : fg
 
       if (!contrastResult.passesAA) {
         result.passed = false
@@ -146,7 +154,7 @@ export function testCommonPatterns(): TestResult {
           foreground: fg,
           background: bg,
           ratio: contrastResult.ratio,
-          required: 4.5
+          required: 4.5,
         })
       }
     }
