@@ -7,13 +7,13 @@
     "build": "next build --turbopack",
     "start": "next start",
     "type-check": "tsc --noEmit",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "test": "echo 'Tests will be added soon'",
     "test:a11y": "node scripts/a11y-check.js",
     "audit:colors": "npx tsx lib/accessibility/color-contrast.ts",
-    "precommit": "npm run format:check && npm run type-check && npm run lint && npm run test:a11y"
+    "prepare": "husky"
   },
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "^2.18.3",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
+    "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.8.0",
     "@types/leaflet": "^1.9.20",
@@ -36,6 +37,7 @@
     "axe-playwright": "^2.2.2",
     "eslint": "^9.36.0",
     "eslint-config-next": "^15.5.4",
+    "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
