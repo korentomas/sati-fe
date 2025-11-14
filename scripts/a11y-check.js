@@ -5,6 +5,7 @@
  * Tests HTML files for WCAG violations
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { execSync } = require('child_process')
 
 console.log('🔍 SATI Accessibility Check\n')
@@ -34,7 +35,7 @@ for (const url of urls) {
   console.log(`Checking ${url}...`)
   try {
     // Run axe on the URL and check for color contrast issues specifically
-    const result = execSync(
+    execSync(
       `npx @axe-core/cli ${url} --rules color-contrast,color-contrast-enhanced --disable link-name,region`,
       { encoding: 'utf8' }
     )

@@ -22,7 +22,7 @@ declare module 'leaflet' {
   interface PM {
     addControls(options?: PMOptions): void
     removeControls(): void
-    enableDraw(shape: string, options?: any): void
+    enableDraw(shape: string, options?: Record<string, unknown>): void
     disableDraw(): void
   }
 

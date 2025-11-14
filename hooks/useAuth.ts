@@ -63,12 +63,13 @@ export function useAuth(requireAuth: boolean = true) {
   }, [router, pathname, requireAuth])
 
   const handleAuthError = useCallback(
-    (error: any) => {
+    (error: unknown) => {
       // Helper function for handling auth errors in API calls
+      const errorObj = error as { status?: number; message?: string }
       if (
-        error?.status === 401 ||
-        error?.message?.includes('401') ||
-        error?.message?.includes('Unauthorized')
+        errorObj?.status === 401 ||
+        errorObj?.message?.includes('401') ||
+        errorObj?.message?.includes('Unauthorized')
       ) {
         apiClient.logout()
         router.push(`/login?from=${encodeURIComponent(pathname)}`)

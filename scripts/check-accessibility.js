@@ -5,7 +5,9 @@
  * Run this to validate color contrast in the project
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { execSync } = require('child_process')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
 
 console.log('🔍 SATI Accessibility Check\n')
@@ -18,7 +20,7 @@ try {
   })
 
   console.log('\n✅ Accessibility check completed!')
-} catch (error) {
+} catch {
   console.error('\n❌ Accessibility check failed!')
   process.exit(1)
 }

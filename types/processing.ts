@@ -39,7 +39,7 @@ export interface ProcessingRequest {
   mosaic_id?: string
   aoi?: GeoJSON.Polygon
   aggregation_method?: AggregationMethod
-  parameters?: Record<string, any>
+  parameters?: Record<string, unknown>
   name?: string
 }
 
@@ -62,9 +62,9 @@ export interface ProcessingJob {
   stage?: string
   message?: string
   result_url?: string
-  result_data?: Record<string, any>
+  result_data?: Record<string, unknown>
   output_files?: string[]
-  parameters?: Record<string, any>
+  parameters?: Record<string, unknown>
   error?: string
   execution_time?: number
 }

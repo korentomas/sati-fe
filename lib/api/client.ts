@@ -72,7 +72,7 @@ interface SceneResponse {
   geometry: GeoJSONGeometry
   properties: SceneProperties
   thumbnail_url?: string
-  assets: Record<string, any>
+  assets: Record<string, unknown>
 }
 
 interface SearchResponse {
@@ -265,27 +265,31 @@ class ApiClient {
   }
 
   // Processing endpoints
-  async createProcessingJob(request: any): Promise<ApiResponse<any>> {
-    return this.request<any>('/processing/jobs', {
+  async createProcessingJob(
+    request: Record<string, unknown>
+  ): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.request<Record<string, unknown>>('/processing/jobs', {
       method: 'POST',
       body: JSON.stringify(request),
     })
   }
 
-  async createSpectralIndex(request: any): Promise<ApiResponse<any>> {
-    return this.request<any>('/processing/spectral-index', {
+  async createSpectralIndex(
+    request: Record<string, unknown>
+  ): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.request<Record<string, unknown>>('/processing/spectral-index', {
       method: 'POST',
       body: JSON.stringify(request),
     })
   }
 
-  async getProcessingJob(jobId: string): Promise<ApiResponse<any>> {
-    return this.request<any>(`/processing/jobs/${jobId}`)
+  async getProcessingJob(jobId: string): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.request<Record<string, unknown>>(`/processing/jobs/${jobId}`)
   }
 
-  async listProcessingJobs(status?: string): Promise<ApiResponse<any[]>> {
+  async listProcessingJobs(status?: string): Promise<ApiResponse<Record<string, unknown>[]>> {
     const params = status ? `?status=${status}` : ''
-    return this.request<any[]>(`/processing/jobs${params}`)
+    return this.request<Record<string, unknown>[]>(`/processing/jobs${params}`)
   }
 
   async cancelProcessingJob(jobId: string): Promise<ApiResponse<void>> {
@@ -294,8 +298,8 @@ class ApiClient {
     })
   }
 
-  async getProcessingResult(jobId: string): Promise<ApiResponse<any>> {
-    return this.request<any>(`/processing/jobs/${jobId}/result`)
+  async getProcessingResult(jobId: string): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.request<Record<string, unknown>>(`/processing/jobs/${jobId}/result`)
   }
 }
 
