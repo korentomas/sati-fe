@@ -5,7 +5,7 @@ export enum ProcessingType {
   ZONAL_STATISTICS = 'zonal_statistics',
   TEMPORAL_COMPOSITE = 'temporal_composite',
   BAND_MATH = 'band_math',
-  MASK_EXTRACTION = 'mask_extraction'
+  MASK_EXTRACTION = 'mask_extraction',
 }
 
 export enum AggregationMethod {
@@ -16,7 +16,7 @@ export enum AggregationMethod {
   STD = 'std',
   FIRST = 'first',
   LAST = 'last',
-  COUNT = 'count'
+  COUNT = 'count',
 }
 
 export enum SpectralIndex {
@@ -30,7 +30,7 @@ export enum SpectralIndex {
   GNDVI = 'gndvi',
   NDSI = 'ndsi',
   NBR = 'nbr',
-  CUSTOM = 'custom'
+  CUSTOM = 'custom',
 }
 
 export interface ProcessingRequest {

@@ -55,60 +55,60 @@ export const useLayerStore = create<LayerStore>()(
             bands: '',
             min: 0,
             max: 1,
-            gamma: 1
-          }
-        }
+            gamma: 1,
+          },
+        },
       ],
       activeLayerId: null,
 
-  addLayer: (layer) =>
-    set((state) => {
-      // Check if a layer with the same scene ID already exists
-      const existingLayer = state.layers.find(l => {
-        // For satellite layers, check scene ID
-        if (layer.type === 'satellite' && l.type === 'satellite') {
-          return l.scene?.id === layer.scene?.id
-        }
-        // For other layers, check by layer ID
-        return l.id === layer.id
-      })
+      addLayer: (layer) =>
+        set((state) => {
+          // Check if a layer with the same scene ID already exists
+          const existingLayer = state.layers.find((l) => {
+            // For satellite layers, check scene ID
+            if (layer.type === 'satellite' && l.type === 'satellite') {
+              return l.scene?.id === layer.scene?.id
+            }
+            // For other layers, check by layer ID
+            return l.id === layer.id
+          })
 
-      if (existingLayer) {
-        console.log(`Layer ${layer.name} already exists, skipping addition`)
-        return state // Return unchanged state
-      }
+          if (existingLayer) {
+            console.log(`Layer ${layer.name} already exists, skipping addition`)
+            return state // Return unchanged state
+          }
 
-      return {
-        layers: [...state.layers, layer]
-      }
-    }),
+          return {
+            layers: [...state.layers, layer],
+          }
+        }),
 
-  removeLayer: (id) =>
-    set((state) => ({
-      layers: state.layers.filter((l) => l.id !== id),
-      activeLayerId: state.activeLayerId === id ? null : state.activeLayerId
-    })),
+      removeLayer: (id) =>
+        set((state) => ({
+          layers: state.layers.filter((l) => l.id !== id),
+          activeLayerId: state.activeLayerId === id ? null : state.activeLayerId,
+        })),
 
-  toggleLayerVisibility: (id) =>
-    set((state) => ({
-      layers: state.layers.map((layer) =>
-        layer.id === id ? { ...layer, visible: !layer.visible } : layer
-      )
-    })),
+      toggleLayerVisibility: (id) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === id ? { ...layer, visible: !layer.visible } : layer
+          ),
+        })),
 
-  updateLayerVisualization: (id, visualization) =>
-    set((state) => ({
-      layers: state.layers.map((layer) =>
-        layer.id === id
-          ? { ...layer, visualization: { ...layer.visualization, ...visualization } }
-          : layer
-      )
-    })),
+      updateLayerVisualization: (id, visualization) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === id
+              ? { ...layer, visualization: { ...layer.visualization, ...visualization } }
+              : layer
+          ),
+        })),
 
-  setActiveLayer: (id) =>
-    set(() => ({
-      activeLayerId: id
-    })),
+      setActiveLayer: (id) =>
+        set(() => ({
+          activeLayerId: id,
+        })),
 
       reorderLayers: (fromIndex, toIndex) =>
         set((state) => {
@@ -116,18 +116,18 @@ export const useLayerStore = create<LayerStore>()(
           const [movedLayer] = newLayers.splice(fromIndex, 1)
           newLayers.splice(toIndex, 0, movedLayer)
           return { layers: newLayers }
-        })
+        }),
     }),
     {
       name: 'layer-store', // unique name for localStorage key
       partialize: (state) => ({
         // Only persist non-base layers and activeLayerId
-        layers: state.layers.filter(l => l.type !== 'base'),
-        activeLayerId: state.activeLayerId
+        layers: state.layers.filter((l) => l.type !== 'base'),
+        activeLayerId: state.activeLayerId,
       }),
       onRehydrateStorage: () => (state) => {
         // After rehydration, ensure base layer is always present
-        if (state && !state.layers.find(l => l.id === 'osm-base')) {
+        if (state && !state.layers.find((l) => l.id === 'osm-base')) {
           state.layers.unshift({
             id: 'osm-base',
             name: 'OpenStreetMap',
@@ -140,11 +140,11 @@ export const useLayerStore = create<LayerStore>()(
               bands: '',
               min: 0,
               max: 1,
-              gamma: 1
-            }
+              gamma: 1,
+            },
           })
         }
-      }
+      },
     }
   )
 )

@@ -248,7 +248,7 @@ class ApiClient {
   async searchImagery(request: SearchRequest): Promise<ApiResponse<SearchResponse>> {
     return this.request<SearchResponse>('/imagery/search', {
       method: 'POST',
-      body: JSON.stringify(request)
+      body: JSON.stringify(request),
     })
   }
 
@@ -268,14 +268,14 @@ class ApiClient {
   async createProcessingJob(request: any): Promise<ApiResponse<any>> {
     return this.request<any>('/processing/jobs', {
       method: 'POST',
-      body: JSON.stringify(request)
+      body: JSON.stringify(request),
     })
   }
 
   async createSpectralIndex(request: any): Promise<ApiResponse<any>> {
     return this.request<any>('/processing/spectral-index', {
       method: 'POST',
-      body: JSON.stringify(request)
+      body: JSON.stringify(request),
     })
   }
 
@@ -290,7 +290,7 @@ class ApiClient {
 
   async cancelProcessingJob(jobId: string): Promise<ApiResponse<void>> {
     return this.request<void>(`/processing/jobs/${jobId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     })
   }
 

@@ -30,7 +30,7 @@ export default function AnalysisPanel({ selectedLayers }: AnalysisPanelProps) {
           value={selectedIndex}
           onChange={(e) => setSelectedIndex(e.target.value)}
         >
-          {indices.map(idx => (
+          {indices.map((idx) => (
             <option key={idx.id} value={idx.id}>
               {idx.name} - {idx.desc}
             </option>
@@ -40,16 +40,17 @@ export default function AnalysisPanel({ selectedLayers }: AnalysisPanelProps) {
 
       {selectedLayers.length > 0 && (
         <>
-          <button className={styles.searchButton}>
-            [ CALCULATE INDEX ]
-          </button>
+          <button className={styles.searchButton}>[ CALCULATE INDEX ]</button>
 
           <div style={{ marginTop: '20px' }}>
             <h4 style={{ margin: '0 0 12px 0', fontSize: '13px' }}>STATISTICS</h4>
             <div style={{ fontSize: '11px', color: 'rgb(var(--muted-foreground))' }}>
-              Min: --<br />
-              Max: --<br />
-              Mean: --<br />
+              Min: --
+              <br />
+              Max: --
+              <br />
+              Mean: --
+              <br />
               Std Dev: --
             </div>
           </div>

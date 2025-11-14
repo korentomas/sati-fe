@@ -17,7 +17,7 @@ export default function TopToolbar({
   onToggleTheme,
   onSave,
   onExport,
-  onNewProject
+  onNewProject,
 }: TopToolbarProps) {
   const router = useRouter()
 
@@ -27,10 +27,13 @@ export default function TopToolbar({
   }
 
   const getThemeLabel = () => {
-    switch(themeMode) {
-      case 'auto': return '[AUTO]'
-      case 'light': return '[LIGHT]'
-      case 'dark': return '[DARK]'
+    switch (themeMode) {
+      case 'auto':
+        return '[AUTO]'
+      case 'light':
+        return '[LIGHT]'
+      case 'dark':
+        return '[DARK]'
     }
   }
 

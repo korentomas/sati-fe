@@ -17,7 +17,7 @@ export default function ImageCarousel({
   initialIndex,
   isOpen,
   onClose,
-  onAddLayer
+  onAddLayer,
 }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
@@ -29,20 +29,18 @@ export default function ImageCarousel({
   useEffect(() => {
     if (!isOpen) return
 
-    const indicesToPreload = [
-      currentIndex,
-      currentIndex - 1,
-      currentIndex + 1
-    ].filter(i => i >= 0 && i < scenes.length)
+    const indicesToPreload = [currentIndex, currentIndex - 1, currentIndex + 1].filter(
+      (i) => i >= 0 && i < scenes.length
+    )
 
-    indicesToPreload.forEach(index => {
+    indicesToPreload.forEach((index) => {
       if (!loadedImages.has(index) && !loadingImages.has(index)) {
         const img = new Image()
-        setLoadingImages(prev => new Set(prev).add(index))
+        setLoadingImages((prev) => new Set(prev).add(index))
 
         img.onload = () => {
-          setLoadedImages(prev => new Set(prev).add(index))
-          setLoadingImages(prev => {
+          setLoadedImages((prev) => new Set(prev).add(index))
+          setLoadingImages((prev) => {
             const next = new Set(prev)
             next.delete(index)
             return next
@@ -50,7 +48,7 @@ export default function ImageCarousel({
         }
 
         img.onerror = () => {
-          setLoadingImages(prev => {
+          setLoadingImages((prev) => {
             const next = new Set(prev)
             next.delete(index)
             return next
@@ -64,11 +62,11 @@ export default function ImageCarousel({
   }, [currentIndex, scenes, isOpen, loadedImages, loadingImages])
 
   const handlePrevious = useCallback(() => {
-    setCurrentIndex(prev => Math.max(0, prev - 1))
+    setCurrentIndex((prev) => Math.max(0, prev - 1))
   }, [])
 
   const handleNext = useCallback(() => {
-    setCurrentIndex(prev => Math.min(scenes.length - 1, prev + 1))
+    setCurrentIndex((prev) => Math.min(scenes.length - 1, prev + 1))
   }, [scenes.length])
 
   // Keyboard navigation
@@ -76,7 +74,7 @@ export default function ImageCarousel({
     if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      switch(e.key) {
+      switch (e.key) {
         case 'ArrowLeft':
           handlePrevious()
           break
@@ -148,9 +146,7 @@ export default function ImageCarousel({
                 )}
               </>
             ) : (
-              <div className={styles.carouselNoImage}>
-                No preview available
-              </div>
+              <div className={styles.carouselNoImage}>No preview available</div>
             )}
           </div>
 
@@ -205,10 +201,7 @@ export default function ImageCarousel({
             </div>
 
             <div className={styles.carouselActions}>
-              <button
-                className={styles.carouselAddLayer}
-                onClick={() => onAddLayer(currentScene)}
-              >
+              <button className={styles.carouselAddLayer} onClick={() => onAddLayer(currentScene)}>
                 [ADD AS LAYER]
               </button>
             </div>
@@ -228,9 +221,7 @@ export default function ImageCarousel({
               {scene.thumbnail_url ? (
                 <img src={scene.thumbnail_url} alt={scene.id} />
               ) : (
-                <div className={styles.carouselThumbnailEmpty}>
-                  {index + 1}
-                </div>
+                <div className={styles.carouselThumbnailEmpty}>{index + 1}</div>
               )}
             </div>
           ))}

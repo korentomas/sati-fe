@@ -13,7 +13,7 @@ interface SearchPanelProps {
 }
 
 export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }: SearchPanelProps) {
-  const addLayer = useLayerStore(state => state.addLayer)
+  const addLayer = useLayerStore((state) => state.addLayer)
   const [dateFrom, setDateFrom] = useState(
     new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   )
@@ -42,8 +42,8 @@ export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }:
         bands: 'B4,B3,B2', // Default to true color
         min: 0,
         max: 3000, // Default for Sentinel-2
-        gamma: 1
-      }
+        gamma: 1,
+      },
     })
 
     // Call the parent handler if provided
@@ -75,7 +75,7 @@ export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }:
         date_to: dateTo,
         collections: [collection],
         cloud_cover_max: cloudCover,
-        limit: 20
+        limit: 20,
       })
 
       if (response.error) {
@@ -140,11 +140,7 @@ export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }:
         <span style={{ fontSize: '11px' }}>{cloudCover}%</span>
       </div>
 
-      {error && (
-        <div style={{ color: 'rgb(var(--destructive))', fontSize: '11px' }}>
-          {error}
-        </div>
-      )}
+      {error && <div style={{ color: 'rgb(var(--destructive))', fontSize: '11px' }}>{error}</div>}
 
       <button
         className={styles.searchButton}
@@ -155,26 +151,24 @@ export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }:
       </button>
 
       {!drawnPolygon && (
-        <div className={styles.infoMessage}>
-          Draw a polygon on the map to search for imagery
-        </div>
+        <div className={styles.infoMessage}>Draw a polygon on the map to search for imagery</div>
       )}
 
       {showResults && searchResults.length > 0 && (
         <div className={styles.searchResults}>
-          <div className={styles.resultsHeader}>
-            Found {searchResults.length} scenes
-          </div>
-          <div style={{
-            fontSize: '11px',
-            padding: '8px',
-            background: 'rgba(var(--warning), 0.1)',
-            border: '1px solid rgba(var(--warning), 0.3)',
-            marginBottom: '8px'
-          }}>
-            ℹ️ <strong>Note:</strong> Each satellite scene covers a fixed area (~100km²).
-            Your area may require multiple scenes for complete coverage.
-            Green dashed lines show actual scene boundaries.
+          <div className={styles.resultsHeader}>Found {searchResults.length} scenes</div>
+          <div
+            style={{
+              fontSize: '11px',
+              padding: '8px',
+              background: 'rgba(var(--warning), 0.1)',
+              border: '1px solid rgba(var(--warning), 0.3)',
+              marginBottom: '8px',
+            }}
+          >
+            ℹ️ <strong>Note:</strong> Each satellite scene covers a fixed area (~100km²). Your area
+            may require multiple scenes for complete coverage. Green dashed lines show actual scene
+            boundaries.
           </div>
           <div className={styles.resultsList}>
             {searchResults.map((scene, index) => (
@@ -185,11 +179,7 @@ export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }:
                 style={{ cursor: 'pointer' }}
               >
                 {scene.thumbnail_url && (
-                  <img
-                    src={scene.thumbnail_url}
-                    alt={scene.id}
-                    className={styles.sceneThumbnail}
-                  />
+                  <img src={scene.thumbnail_url} alt={scene.id} className={styles.sceneThumbnail} />
                 )}
                 <div className={styles.sceneInfo}>
                   <div className={styles.sceneId}>{scene.id}</div>
@@ -198,9 +188,7 @@ export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }:
                     <span>Cloud: {scene.properties.cloud_cover?.toFixed(1) || 'N/A'}%</span>
                     {/* Show if scene might not fully cover the area */}
                     {drawnPolygon && scene.geometry && (
-                      <span style={{ color: 'rgb(var(--warning))' }}>
-                        ⚠️ Check coverage
-                      </span>
+                      <span style={{ color: 'rgb(var(--warning))' }}>⚠️ Check coverage</span>
                     )}
                   </div>
                   <div className={styles.sceneActions}>
@@ -231,9 +219,7 @@ export default function SearchPanel({ drawnPolygon, onSceneSelect, onLayerAdd }:
       )}
 
       {showResults && searchResults.length === 0 && (
-        <div className={styles.infoMessage}>
-          No scenes found for the selected criteria
-        </div>
+        <div className={styles.infoMessage}>No scenes found for the selected criteria</div>
       )}
 
       {/* Image Carousel Modal */}

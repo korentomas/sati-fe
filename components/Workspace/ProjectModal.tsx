@@ -10,7 +10,12 @@ interface ProjectModalProps {
   pendingAction: 'save' | 'export' | null
 }
 
-export default function ProjectModal({ isOpen, onClose, onCreate, pendingAction }: ProjectModalProps) {
+export default function ProjectModal({
+  isOpen,
+  onClose,
+  onCreate,
+  pendingAction,
+}: ProjectModalProps) {
   const [projectName, setProjectName] = useState('')
   const [error, setError] = useState('')
 
@@ -67,10 +72,16 @@ export default function ProjectModal({ isOpen, onClose, onCreate, pendingAction 
 
           <div className={styles.modalDescription}>
             {pendingAction === 'save' && (
-              <p>You need to create a project before saving your work. This will help organize your layers, analysis, and results.</p>
+              <p>
+                You need to create a project before saving your work. This will help organize your
+                layers, analysis, and results.
+              </p>
             )}
             {pendingAction === 'export' && (
-              <p>You need to create a project before exporting. All your layers and analysis will be associated with this project.</p>
+              <p>
+                You need to create a project before exporting. All your layers and analysis will be
+                associated with this project.
+              </p>
             )}
             {!pendingAction && (
               <p>Create a new project to organize your GIS work, layers, and analysis results.</p>

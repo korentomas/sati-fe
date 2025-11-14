@@ -27,9 +27,7 @@ export default function TimeSeriesPanel({ selectedLayers }: TimeSeriesPanelProps
         </select>
       </div>
 
-      <button className={styles.searchButton}>
-        [ BUILD TIME SERIES ]
-      </button>
+      <button className={styles.searchButton}>[ BUILD TIME SERIES ]</button>
 
       <div style={{ marginTop: '20px', fontSize: '11px', color: 'rgb(var(--muted-foreground))' }}>
         [ TIME SERIES CHART WILL APPEAR HERE ]

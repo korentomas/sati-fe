@@ -23,17 +23,12 @@ npm run type-check || {
   exit 1
 }
 
-# Lint (matches CI: lint) - only lint staged files to avoid blocking on pre-existing issues
-echo "🧹 Running linter on staged files..."
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
-if [ -n "$STAGED_FILES" ]; then
-  echo "$STAGED_FILES" | xargs npx eslint || {
-    echo "❌ Lint failed on staged files."
-    exit 1
-  }
-else
-  echo "No TypeScript files to lint."
-fi
+# Lint (matches CI: lint)
+echo "🧹 Running linter..."
+npm run lint || {
+  echo "❌ Lint failed."
+  exit 1
+}
 
 # Tests (matches CI: npm test --passWithNoTests)
 echo "🧪 Running tests..."

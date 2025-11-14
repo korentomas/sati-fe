@@ -18,7 +18,7 @@ export default function PropertiesPanel({ selectedLayers }: PropertiesPanelProps
   return (
     <div>
       <h4 style={{ margin: '0 0 12px 0', fontSize: '13px' }}>LAYER PROPERTIES</h4>
-      {selectedLayers.map(layerId => (
+      {selectedLayers.map((layerId) => (
         <div key={layerId} style={{ marginBottom: '16px' }}>
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Layer ID</label>
@@ -27,17 +27,35 @@ export default function PropertiesPanel({ selectedLayers }: PropertiesPanelProps
 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Brightness</label>
-            <input type="range" className={styles.formInput} min="-100" max="100" defaultValue="0" />
+            <input
+              type="range"
+              className={styles.formInput}
+              min="-100"
+              max="100"
+              defaultValue="0"
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Contrast</label>
-            <input type="range" className={styles.formInput} min="-100" max="100" defaultValue="0" />
+            <input
+              type="range"
+              className={styles.formInput}
+              min="-100"
+              max="100"
+              defaultValue="0"
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Saturation</label>
-            <input type="range" className={styles.formInput} min="-100" max="100" defaultValue="0" />
+            <input
+              type="range"
+              className={styles.formInput}
+              min="-100"
+              max="100"
+              defaultValue="0"
+            />
           </div>
 
           <div className={styles.formGroup}>

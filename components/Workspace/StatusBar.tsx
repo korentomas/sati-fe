@@ -7,12 +7,7 @@ interface StatusBarProps {
   rightPanelOpen: boolean
 }
 
-export default function StatusBar({
-  coords,
-  zoom,
-  leftPanelOpen,
-  rightPanelOpen
-}: StatusBarProps) {
+export default function StatusBar({ coords, zoom, leftPanelOpen, rightPanelOpen }: StatusBarProps) {
   return (
     <div className={styles.statusBar}>
       <div className={styles.statusSection}>

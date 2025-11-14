@@ -18,12 +18,12 @@ export default function RightPanel({
   activeTab,
   onTabChange,
   onToggle,
-  selectedLayers
+  selectedLayers,
 }: RightPanelProps) {
   const tabs = [
     { id: 'properties', label: 'PROPERTIES' },
     { id: 'analysis', label: 'ANALYSIS' },
-    { id: 'timeseries', label: 'TIME SERIES' }
+    { id: 'timeseries', label: 'TIME SERIES' },
   ]
 
   return (
@@ -33,29 +33,24 @@ export default function RightPanel({
           {isOpen ? '▶' : '◀'}
         </button>
         <div className={styles.panelTabs}>
-          {isOpen && tabs.map(tab => (
-            <button
-              key={tab.id}
-              className={`${styles.panelTab} ${activeTab === tab.id ? styles.panelTabActive : ''}`}
-              onClick={() => onTabChange(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {isOpen &&
+            tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={`${styles.panelTab} ${activeTab === tab.id ? styles.panelTabActive : ''}`}
+                onClick={() => onTabChange(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
         </div>
       </div>
 
       {isOpen && (
         <div className={styles.panelContent}>
-          {activeTab === 'properties' && (
-            <PropertiesPanel selectedLayers={selectedLayers} />
-          )}
-          {activeTab === 'analysis' && (
-            <AnalysisPanel selectedLayers={selectedLayers} />
-          )}
-          {activeTab === 'timeseries' && (
-            <TimeSeriesPanel selectedLayers={selectedLayers} />
-          )}
+          {activeTab === 'properties' && <PropertiesPanel selectedLayers={selectedLayers} />}
+          {activeTab === 'analysis' && <AnalysisPanel selectedLayers={selectedLayers} />}
+          {activeTab === 'timeseries' && <TimeSeriesPanel selectedLayers={selectedLayers} />}
         </div>
       )}
     </div>

@@ -60,6 +60,6 @@ export function useTheme() {
   return {
     theme: currentTheme,
     mode,
-    setTheme
+    setTheme,
   }
 }

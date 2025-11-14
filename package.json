@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "type-check": "tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "test": "echo 'Tests will be added soon'",

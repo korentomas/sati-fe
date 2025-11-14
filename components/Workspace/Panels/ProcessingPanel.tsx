@@ -15,7 +15,7 @@ interface ProcessingJob {
   type: string
   status: 'pending' | 'processing' | 'completed' | 'failed'
   progress: number
-  layerIds: string[]  // Changed from layerId to support multiple
+  layerIds: string[] // Changed from layerId to support multiple
   aggregationMethod?: string
   createdAt: Date
 }
@@ -24,18 +24,18 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
   const [processingType, setProcessingType] = useState('indices')
   const [selectedIndex, setSelectedIndex] = useState<SpectralIndex>(SpectralIndex.NDVI)
   const [selectedLayerIds, setSelectedLayerIds] = useState<string[]>([])
-  const [aggregationMethod, setAggregationMethod] = useState<AggregationMethod>(AggregationMethod.MEAN)
+  const [aggregationMethod, setAggregationMethod] = useState<AggregationMethod>(
+    AggregationMethod.MEAN
+  )
   const [processingJobs, setProcessingJobs] = useState<ProcessingJob[]>([])
-  const layers = useLayerStore(state => state.layers)
+  const layers = useLayerStore((state) => state.layers)
 
   // Get satellite layers for processing
-  const satelliteLayers = layers.filter(l => l.type === 'satellite')
+  const satelliteLayers = layers.filter((l) => l.type === 'satellite')
 
   const handleLayerToggle = (layerId: string) => {
-    setSelectedLayerIds(prev =>
-      prev.includes(layerId)
-        ? prev.filter(id => id !== layerId)
-        : [...prev, layerId]
+    setSelectedLayerIds((prev) =>
+      prev.includes(layerId) ? prev.filter((id) => id !== layerId) : [...prev, layerId]
     )
   }
 
@@ -44,10 +44,12 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
 
     try {
       // Get scene IDs from selected layers
-      const sceneIds = selectedLayerIds.map(layerId => {
-        const layer = layers.find(l => l.id === layerId)
-        return layer?.scene?.id
-      }).filter(Boolean)
+      const sceneIds = selectedLayerIds
+        .map((layerId) => {
+          const layer = layers.find((l) => l.id === layerId)
+          return layer?.scene?.id
+        })
+        .filter(Boolean)
 
       if (sceneIds.length === 0) {
         console.error('No valid scene IDs found')
@@ -57,7 +59,8 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
       // Build request based on processing type
       let request: any = {
         scene_ids: sceneIds,
-        aggregation_method: selectedLayerIds.length > 1 ? aggregationMethod : AggregationMethod.MEAN
+        aggregation_method:
+          selectedLayerIds.length > 1 ? aggregationMethod : AggregationMethod.MEAN,
       }
 
       let response
@@ -66,14 +69,14 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
         request = {
           ...request,
           index_type: selectedIndex,
-          type: ProcessingType.SPECTRAL_INDEX
+          type: ProcessingType.SPECTRAL_INDEX,
         }
         response = await apiClient.createSpectralIndex(request)
       } else {
         // Use general processing endpoint
         request = {
           ...request,
-          type: processingType as ProcessingType
+          type: processingType as ProcessingType,
         }
         response = await apiClient.createProcessingJob(request)
       }
@@ -91,7 +94,7 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
         progress: response.data.progress || 0,
         layerIds: selectedLayerIds,
         aggregationMethod: selectedLayerIds.length > 1 ? aggregationMethod : undefined,
-        createdAt: new Date()
+        createdAt: new Date(),
       }
 
       setProcessingJobs([...processingJobs, job])
@@ -123,14 +126,14 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
             bands: 'ndvi',
             min: result.statistics?.min || -1,
             max: result.statistics?.max || 1,
-            gamma: 1
+            gamma: 1,
           },
           result: {
             job_id: jobId,
             type: result.index_type || result.type,
             file_path: result.output_file,
-            statistics: result.statistics
-          }
+            statistics: result.statistics,
+          },
         }
 
         // Add to layer store
@@ -173,15 +176,17 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
       try {
         const response = await apiClient.getProcessingJob(jobId)
         if (response.data) {
-          setProcessingJobs(prev => prev.map(job =>
-            job.id === jobId
-              ? {
-                  ...job,
-                  status: response.data.status,
-                  progress: response.data.progress || 0
-                }
-              : job
-          ))
+          setProcessingJobs((prev) =>
+            prev.map((job) =>
+              job.id === jobId
+                ? {
+                    ...job,
+                    status: response.data.status,
+                    progress: response.data.progress || 0,
+                  }
+                : job
+            )
+          )
 
           // Stop polling if job is complete
           if (['completed', 'failed', 'cancelled'].includes(response.data.status)) {
@@ -207,15 +212,17 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
       {/* Select Layers (Multi-select with checkboxes) */}
       <div className={styles.formGroup}>
         <label className={styles.formLabel}>Source Layers</label>
-        <div style={{
-          maxHeight: '120px',
-          overflowY: 'auto',
-          border: '1px solid rgb(var(--border))',
-          borderRadius: '4px',
-          padding: '8px'
-        }}>
+        <div
+          style={{
+            maxHeight: '120px',
+            overflowY: 'auto',
+            border: '1px solid rgb(var(--border))',
+            borderRadius: '4px',
+            padding: '8px',
+          }}
+        >
           {satelliteLayers.length > 0 ? (
-            satelliteLayers.map(layer => (
+            satelliteLayers.map((layer) => (
               <label
                 key={layer.id}
                 style={{
@@ -224,7 +231,7 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
                   gap: '8px',
                   padding: '4px 0',
                   cursor: 'pointer',
-                  fontSize: '12px'
+                  fontSize: '12px',
                 }}
               >
                 <input
@@ -346,7 +353,7 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Compare With</label>
             <select className={styles.formInput}>
-              {satelliteLayers.map(layer => (
+              {satelliteLayers.map((layer) => (
                 <option key={layer.id} value={layer.id}>
                   {layer.name}
                 </option>
@@ -407,7 +414,7 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
         <h4 style={{ margin: '0 0 12px 0', fontSize: '13px' }}>PROCESSING QUEUE</h4>
         {processingJobs.length > 0 ? (
           <div className={styles.jobsList}>
-            {processingJobs.map(job => (
+            {processingJobs.map((job) => (
               <div key={job.id} className={styles.jobItem}>
                 <div className={styles.jobHeader}>
                   <span className={styles.jobType}>{job.type.toUpperCase()}</span>
@@ -415,10 +422,7 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
                 </div>
                 {job.status === 'processing' && (
                   <div className={styles.jobProgress}>
-                    <div
-                      className={styles.jobProgressBar}
-                      style={{ width: `${job.progress}%` }}
-                    />
+                    <div className={styles.jobProgressBar} style={{ width: `${job.progress}%` }} />
                   </div>
                 )}
                 {job.status === 'completed' && (

@@ -13,7 +13,7 @@ import styles from './workspace.module.css'
 
 const WorkspaceMap = dynamic(() => import('@/components/Workspace/WorkspaceMap'), {
   ssr: false,
-  loading: () => <div className={styles.loading}>[ LOADING MAP... ]</div>
+  loading: () => <div className={styles.loading}>[ LOADING MAP... ]</div>,
 })
 
 export default function WorkspacePage() {
@@ -33,16 +33,16 @@ export default function WorkspacePage() {
 
   const handleTogglePanel = useCallback((side: 'left' | 'right') => {
     if (side === 'left') {
-      setLeftPanelOpen(prev => !prev)
+      setLeftPanelOpen((prev) => !prev)
     } else {
-      setRightPanelOpen(prev => !prev)
+      setRightPanelOpen((prev) => !prev)
     }
   }, [])
 
   const handleLayerSelect = useCallback((layerId: string) => {
-    setSelectedLayers(prev => {
+    setSelectedLayers((prev) => {
       if (prev.includes(layerId)) {
-        return prev.filter(id => id !== layerId)
+        return prev.filter((id) => id !== layerId)
       }
       return [...prev, layerId]
     })
@@ -70,24 +70,27 @@ export default function WorkspacePage() {
     }
   }, [currentProject])
 
-  const handleProjectCreate = useCallback((projectName: string) => {
-    const newProject = {
-      id: `proj_${Date.now()}`,
-      name: projectName
-    }
-    setCurrentProject(newProject)
-    setShowProjectModal(false)
+  const handleProjectCreate = useCallback(
+    (projectName: string) => {
+      const newProject = {
+        id: `proj_${Date.now()}`,
+        name: projectName,
+      }
+      setCurrentProject(newProject)
+      setShowProjectModal(false)
 
-    // Execute pending action if any
-    if (pendingAction === 'save') {
-      console.log('Saving to new project:', projectName)
-      // TODO: Implement actual save logic
-    } else if (pendingAction === 'export') {
-      console.log('Exporting new project:', projectName)
-      // TODO: Implement actual export logic
-    }
-    setPendingAction(null)
-  }, [pendingAction])
+      // Execute pending action if any
+      if (pendingAction === 'save') {
+        console.log('Saving to new project:', projectName)
+        // TODO: Implement actual save logic
+      } else if (pendingAction === 'export') {
+        console.log('Exporting new project:', projectName)
+        // TODO: Implement actual export logic
+      }
+      setPendingAction(null)
+    },
+    [pendingAction]
+  )
 
   const handleToggleTheme = useCallback(() => {
     const nextMode = mode === 'auto' ? 'light' : mode === 'light' ? 'dark' : 'auto'

@@ -29,14 +29,14 @@ export default function WorkspaceMap({
   onCoordsChange,
   onZoomChange,
   selectedLayers,
-  onPolygonDrawn
+  onPolygonDrawn,
 }: WorkspaceMapProps) {
   const mapRef = useRef<L.Map | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const drawnLayersRef = useRef<L.FeatureGroup | null>(null)
   const tileLayersRef = useRef<Map<string, L.TileLayer>>(new Map())
 
-  const layers = useLayerStore(state => state.layers)
+  const layers = useLayerStore((state) => state.layers)
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
@@ -45,7 +45,7 @@ export default function WorkspaceMap({
     const map = L.map(containerRef.current, {
       center: [40.0, -3.0], // Spain
       zoom: 6,
-      zoomControl: false
+      zoomControl: false,
     })
 
     // Add zoom control in top-right
@@ -117,13 +117,12 @@ export default function WorkspaceMap({
 
     return () => {
       // Clean up tile layers
-      tileLayersRef.current.forEach(tileLayer => {
+      tileLayersRef.current.forEach((tileLayer) => {
         if (mapRef.current?.hasLayer(tileLayer)) {
           mapRef.current.removeLayer(tileLayer)
         }
       })
       tileLayersRef.current.clear()
-
 
       if (mapRef.current) {
         mapRef.current.remove()
@@ -140,7 +139,7 @@ export default function WorkspaceMap({
     const tileLayers = tileLayersRef.current
 
     // Process each layer from the store
-    layers.forEach(layer => {
+    layers.forEach((layer) => {
       if (layer.type === 'processing' && layer.result) {
         // Handle processing result layers
         const existingTileLayer = tileLayers.get(layer.id)
@@ -267,7 +266,7 @@ export default function WorkspaceMap({
     })
 
     // Remove tile layers that are no longer in store
-    const layerIds = new Set(layers.map(l => l.id))
+    const layerIds = new Set(layers.map((l) => l.id))
     tileLayers.forEach((tileLayer, id) => {
       if (!layerIds.has(id)) {
         map.removeLayer(tileLayer)
@@ -282,7 +281,7 @@ export default function WorkspaceMap({
       style={{
         width: '100%',
         height: '100%',
-        background: 'rgb(var(--muted))'
+        background: 'rgb(var(--muted))',
       }}
     />
   )

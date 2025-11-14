@@ -138,7 +138,11 @@ const ImageryMap = memo(
                   opacity: layer.opacity,
                   attribution: `© ${layer.name}`,
                 })
-              } else if (layer.url.includes('{z}') && layer.url.includes('{x}') && layer.url.includes('{y}')) {
+              } else if (
+                layer.url.includes('{z}') &&
+                layer.url.includes('{x}') &&
+                layer.url.includes('{y}')
+              ) {
                 // This is a tile URL pattern - use as tile layer
                 mapLayer = L.tileLayer(layer.url, {
                   opacity: layer.opacity,
@@ -147,7 +151,8 @@ const ImageryMap = memo(
                   minZoom: 2,
                   tileSize: 256,
                   crossOrigin: true,
-                  errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', // Transparent 1x1 pixel
+                  errorTileUrl:
+                    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', // Transparent 1x1 pixel
                 })
 
                 // Add loading and error event handlers
@@ -208,7 +213,7 @@ const ImageryMap = memo(
         if (mapLayer) {
           // Update existing layer
           if ('setOpacity' in mapLayer && typeof mapLayer.setOpacity === 'function') {
-            (mapLayer as L.TileLayer).setOpacity(layer.opacity)
+            ;(mapLayer as L.TileLayer).setOpacity(layer.opacity)
           }
 
           if (layer.visible && !map.hasLayer(mapLayer)) {

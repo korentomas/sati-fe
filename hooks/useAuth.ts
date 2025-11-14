@@ -62,19 +62,22 @@ export function useAuth(requireAuth: boolean = true) {
     checkAuth()
   }, [router, pathname, requireAuth])
 
-  const handleAuthError = useCallback((error: any) => {
-    // Helper function for handling auth errors in API calls
-    if (
-      error?.status === 401 ||
-      error?.message?.includes('401') ||
-      error?.message?.includes('Unauthorized')
-    ) {
-      apiClient.logout()
-      router.push(`/login?from=${encodeURIComponent(pathname)}`)
-      return true
-    }
-    return false
-  }, [router, pathname])
+  const handleAuthError = useCallback(
+    (error: any) => {
+      // Helper function for handling auth errors in API calls
+      if (
+        error?.status === 401 ||
+        error?.message?.includes('401') ||
+        error?.message?.includes('Unauthorized')
+      ) {
+        apiClient.logout()
+        router.push(`/login?from=${encodeURIComponent(pathname)}`)
+        return true
+      }
+      return false
+    },
+    [router, pathname]
+  )
 
   return {
     ...authState,

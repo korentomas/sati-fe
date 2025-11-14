@@ -18,9 +18,16 @@ const BAND_COMBINATIONS = [
 ]
 
 export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPanelProps) {
-  const { layers, activeLayerId, toggleLayerVisibility, updateLayerVisualization, setActiveLayer, removeLayer } = useLayerStore()
+  const {
+    layers,
+    activeLayerId,
+    toggleLayerVisibility,
+    updateLayerVisualization,
+    setActiveLayer,
+    removeLayer,
+  } = useLayerStore()
 
-  const activeLayer = layers.find(l => l.id === activeLayerId)
+  const activeLayer = layers.find((l) => l.id === activeLayerId)
 
   return (
     <div className={styles.layersPanel}>
@@ -69,9 +76,11 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
               <select
                 className={styles.controlSelect}
                 value={activeLayer.visualization.bands}
-                onChange={(e) => updateLayerVisualization(activeLayer.id, { bands: e.target.value })}
+                onChange={(e) =>
+                  updateLayerVisualization(activeLayer.id, { bands: e.target.value })
+                }
               >
-                {BAND_COMBINATIONS.map(combo => (
+                {BAND_COMBINATIONS.map((combo) => (
                   <option key={combo.value} value={combo.value}>
                     {combo.label}
                   </option>
@@ -81,21 +90,24 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
           )}
 
           {/* Brightness Control - Only for satellite layers */}
-          {activeLayer.type === 'satellite' && activeLayer.visualization.brightness !== undefined && (
-            <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
-                Brightness: {activeLayer.visualization.brightness}
-              </label>
-              <input
-                type="range"
-                className={styles.controlSlider}
-                min="-100"
-                max="100"
-                value={activeLayer.visualization.brightness}
-                onChange={(e) => updateLayerVisualization(activeLayer.id, { brightness: Number(e.target.value) })}
-              />
-            </div>
-          )}
+          {activeLayer.type === 'satellite' &&
+            activeLayer.visualization.brightness !== undefined && (
+              <div className={styles.controlGroup}>
+                <label className={styles.controlLabel}>
+                  Brightness: {activeLayer.visualization.brightness}
+                </label>
+                <input
+                  type="range"
+                  className={styles.controlSlider}
+                  min="-100"
+                  max="100"
+                  value={activeLayer.visualization.brightness}
+                  onChange={(e) =>
+                    updateLayerVisualization(activeLayer.id, { brightness: Number(e.target.value) })
+                  }
+                />
+              </div>
+            )}
 
           {/* Contrast Control - Only for satellite layers */}
           {activeLayer.type === 'satellite' && activeLayer.visualization.contrast !== undefined && (
@@ -109,7 +121,9 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
                 min="-100"
                 max="100"
                 value={activeLayer.visualization.contrast}
-                onChange={(e) => updateLayerVisualization(activeLayer.id, { contrast: Number(e.target.value) })}
+                onChange={(e) =>
+                  updateLayerVisualization(activeLayer.id, { contrast: Number(e.target.value) })
+                }
               />
             </div>
           )}
@@ -125,7 +139,9 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
               min="0"
               max="100"
               value={activeLayer.visualization.opacity}
-              onChange={(e) => updateLayerVisualization(activeLayer.id, { opacity: Number(e.target.value) })}
+              onChange={(e) =>
+                updateLayerVisualization(activeLayer.id, { opacity: Number(e.target.value) })
+              }
             />
           </div>
 
@@ -142,7 +158,9 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
                 max="2"
                 step="0.1"
                 value={activeLayer.visualization.gamma}
-                onChange={(e) => updateLayerVisualization(activeLayer.id, { gamma: Number(e.target.value) })}
+                onChange={(e) =>
+                  updateLayerVisualization(activeLayer.id, { gamma: Number(e.target.value) })
+                }
               />
             </div>
           )}
@@ -156,7 +174,9 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
                 className={styles.rangeInput}
                 placeholder="Min"
                 value={activeLayer.visualization.min}
-                onChange={(e) => updateLayerVisualization(activeLayer.id, { min: Number(e.target.value) })}
+                onChange={(e) =>
+                  updateLayerVisualization(activeLayer.id, { min: Number(e.target.value) })
+                }
               />
               <span>-</span>
               <input
@@ -164,7 +184,9 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
                 className={styles.rangeInput}
                 placeholder="Max"
                 value={activeLayer.visualization.max}
-                onChange={(e) => updateLayerVisualization(activeLayer.id, { max: Number(e.target.value) })}
+                onChange={(e) =>
+                  updateLayerVisualization(activeLayer.id, { max: Number(e.target.value) })
+                }
               />
             </div>
           </div>
@@ -176,17 +198,17 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
               const resetValues: any = {
                 opacity: 100,
                 min: activeLayer.type === 'processing' ? -1 : 0,
-                max: 1
-              };
+                max: 1,
+              }
 
               // Only reset satellite layer properties if they exist
               if (activeLayer.type === 'satellite') {
-                resetValues.brightness = 0;
-                resetValues.contrast = 0;
-                resetValues.gamma = 1;
+                resetValues.brightness = 0
+                resetValues.contrast = 0
+                resetValues.gamma = 1
               }
 
-              updateLayerVisualization(activeLayer.id, resetValues);
+              updateLayerVisualization(activeLayer.id, resetValues)
             }}
           >
             [RESET]
