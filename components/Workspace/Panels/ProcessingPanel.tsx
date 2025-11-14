@@ -117,11 +117,13 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
           type: 'processing' as const,
           visible: true,
           visualization: {
+            brightness: 0,
+            contrast: 0,
+            opacity: 80,
             bands: 'ndvi',
             min: result.statistics?.min || -1,
             max: result.statistics?.max || 1,
-            palette: 'RdYlGn',
-            opacity: 80
+            gamma: 1
           },
           result: {
             job_id: jobId,
@@ -290,7 +292,7 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
             <select
               className={styles.formInput}
               value={selectedIndex}
-              onChange={(e) => setSelectedIndex(e.target.value)}
+              onChange={(e) => setSelectedIndex(e.target.value as SpectralIndex)}
             >
               <option value="ndvi">NDVI - Vegetation</option>
               <option value="ndwi">NDWI - Water</option>
