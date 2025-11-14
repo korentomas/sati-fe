@@ -30,7 +30,7 @@ jobs:
         run: npm run type-check
 
       - name: Run ESLint
-        run: npm run lint || npx next lint
+        run: npm run lint
 
       - name: Run tests
         run: npm test -- --passWithNoTests || echo "No tests yet"

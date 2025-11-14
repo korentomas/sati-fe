@@ -1,36 +1,40 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+# Navigate to frontend directory if not already there
+if [ -f "package.json" ] && grep -q '"name": "sati-fe"' package.json 2>/dev/null; then
+  # Already in sati-fe directory
+  :
+elif [ -d "sati-fe" ]; then
+  cd sati-fe || exit 1
+fi
 
-cd sati-fe
+echo "🔍 Running pre-commit checks (matching CI workflow)..."
 
-echo "🔍 Running pre-commit checks..."
-
-# Format check
+# Format check (matches CI: format:check)
 echo "📝 Checking formatting..."
 npm run format:check || {
   echo "❌ Format check failed. Run 'npm run format' to fix."
   exit 1
 }
 
-# Type check
+# Type check (matches CI: type-check)
 echo "🔧 Checking types..."
 npm run type-check || {
   echo "❌ Type check failed."
   exit 1
 }
 
-# Lint
+# Lint (matches CI: lint)
 echo "🧹 Running linter..."
 npm run lint || {
   echo "❌ Lint failed."
   exit 1
 }
 
-# Accessibility audit
-echo "♿ Checking color accessibility..."
-npm run audit:colors || {
-  echo "❌ Accessibility check failed. Fix color contrast issues."
+# Tests (matches CI: npm test --passWithNoTests)
+echo "🧪 Running tests..."
+npm test -- --passWithNoTests || {
+  echo "❌ Tests failed."
   exit 1
 }
 
-echo "✅ All checks passed!"
+echo "✅ All pre-commit checks passed!"

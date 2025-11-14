@@ -1,0 +1,43 @@
+.workspace {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  overflow: hidden;
+}
+
+.loading {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--background));
+  color: rgb(var(--muted-foreground));
+  font-family: monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.mainContainer {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.mapContainer {
+  flex: 1;
+  position: relative;
+  background: rgb(var(--muted));
+  min-width: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mainContainer {
+    flex-direction: column;
+  }
+}

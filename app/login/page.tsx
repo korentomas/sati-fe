@@ -12,7 +12,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const returnUrl = searchParams.get('from') || '/dashboard'
+  const returnUrl = searchParams.get('from') || '/workspace'
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

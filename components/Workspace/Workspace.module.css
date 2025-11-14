@@ -1,0 +1,960 @@
+/* Toolbar Styles */
+.toolbar {
+  height: var(--toolbar-height);
+  background: rgb(var(--card));
+  border-bottom: 1px solid rgb(var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.toolbarLeft,
+.toolbarCenter,
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  font-weight: bold;
+  color: rgb(var(--foreground));
+  letter-spacing: 2px;
+}
+
+.separator {
+  color: rgb(var(--muted-foreground));
+}
+
+.projectName {
+  color: rgb(var(--foreground));
+}
+
+.toolButton {
+  background: transparent;
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  padding: 4px 8px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toolButton:hover {
+  background: rgb(var(--muted));
+  border-color: rgb(var(--accent));
+  color: rgb(var(--accent));
+}
+
+/* Panel Styles */
+.panel {
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: width 0.3s ease;
+}
+
+.panelLeft {
+  width: var(--panel-width-left);
+  border-right: 1px solid rgb(var(--border));
+}
+
+.panelRight {
+  width: var(--panel-width-right);
+  border-left: 1px solid rgb(var(--border));
+}
+
+.panelCollapsed {
+  width: 40px !important;
+}
+
+.panelHeader {
+  height: 40px;
+  background: rgb(var(--muted));
+  border-bottom: 1px solid rgb(var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
+.panelTabs {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.panelTab {
+  background: transparent;
+  border: none;
+  color: rgb(var(--muted-foreground));
+  padding: 4px 12px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.panelTab:hover {
+  color: rgb(var(--foreground));
+}
+
+.panelTabActive {
+  color: rgb(var(--accent));
+  border-bottom: 2px solid rgb(var(--accent));
+}
+
+.panelToggle {
+  background: transparent;
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 16px;
+}
+
+.panelContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.panelCollapsed .panelContent {
+  display: none;
+}
+
+.panelCollapsed .panelTabs {
+  display: none;
+}
+
+/* Status Bar */
+.statusBar {
+  height: var(--statusbar-height);
+  background: rgb(var(--card));
+  border-top: 1px solid rgb(var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-family: monospace;
+  font-size: 11px;
+  color: rgb(var(--muted-foreground));
+}
+
+.statusSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.statusItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.statusLabel {
+  color: rgb(var(--foreground));
+}
+
+/* Search Panel Specific */
+.searchForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formLabel {
+  font-size: 11px;
+  color: rgb(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.formInput {
+  background: rgb(var(--background));
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  padding: 6px 8px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.formInput:focus {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 1px;
+  border-color: rgb(var(--accent));
+}
+
+.searchButton {
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
+  border: none;
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.searchButton:hover {
+  opacity: 0.9;
+}
+
+.searchButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+  background: rgb(var(--muted));
+  border-bottom: 1px solid rgb(var(--border));
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  color: rgb(var(--foreground));
+  font-size: 14px;
+  font-weight: bold;
+  font-family: monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.modalClose {
+  background: transparent;
+  border: none;
+  color: rgb(var(--muted-foreground));
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalClose:hover {
+  color: rgb(var(--foreground));
+}
+
+.modalContent {
+  padding: 20px;
+}
+
+.modalDescription {
+  margin-top: 16px;
+  color: rgb(var(--muted-foreground));
+  font-size: 12px;
+  line-height: 1.5;
+  font-family: monospace;
+}
+
+.modalDescription p {
+  margin: 0;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.buttonPrimary {
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
+  border: none;
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: var(--radius);
+}
+
+.buttonPrimary:hover {
+  opacity: 0.9;
+}
+
+.buttonSecondary {
+  background: transparent;
+  color: rgb(var(--foreground));
+  border: 1px solid rgb(var(--border));
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: var(--radius);
+}
+
+.buttonSecondary:hover {
+  background: rgb(var(--muted));
+}
+
+.errorMessage {
+  color: rgb(var(--destructive));
+  font-size: 11px;
+  margin-top: 4px;
+  font-family: monospace;
+}
+
+/* Search Results Styles */
+.infoMessage {
+  padding: 8px;
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  font-size: 11px;
+  color: rgb(var(--muted-foreground));
+  margin-top: 12px;
+  text-align: center;
+  font-family: monospace;
+}
+
+.searchResults {
+  margin-top: 16px;
+  border-top: 1px solid rgb(var(--border));
+  padding-top: 12px;
+}
+
+.resultsHeader {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(var(--foreground));
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.resultsList {
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sceneCard {
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sceneCard:hover {
+  border-color: rgb(var(--accent));
+  background: rgb(var(--card));
+}
+
+.sceneThumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid rgb(var(--border));
+}
+
+.sceneInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sceneId {
+  font-size: 11px;
+  font-weight: bold;
+  color: rgb(var(--foreground));
+  word-break: break-all;
+}
+
+.sceneDetails {
+  font-size: 10px;
+  color: rgb(var(--muted-foreground));
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sceneActions {
+  display: flex;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.sceneButton {
+  background: transparent;
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  padding: 2px 6px;
+  font-size: 10px;
+  cursor: pointer;
+  font-family: monospace;
+  transition: all 0.2s;
+}
+
+.sceneButton:hover {
+  background: rgb(var(--accent));
+  color: rgb(var(--primary-foreground));
+  border-color: rgb(var(--accent));
+}
+
+/* Layers Panel Styles */
+.layersPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.layersList {
+  border-bottom: 1px solid rgb(var(--border));
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.layersHeader {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(var(--foreground));
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.layerItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 11px;
+}
+
+.layerItem:hover {
+  background: rgb(var(--card));
+  border-color: rgb(var(--accent));
+}
+
+.layerItemActive {
+  background: rgb(var(--card));
+  border-color: rgb(var(--accent));
+}
+
+.layerCheckbox {
+  cursor: pointer;
+}
+
+.layerName {
+  flex: 1;
+  color: rgb(var(--foreground));
+  font-family: monospace;
+}
+
+.layerType {
+  color: rgb(var(--muted-foreground));
+  font-size: 10px;
+}
+
+.layerRemove {
+  background: transparent;
+  border: none;
+  color: rgb(var(--muted-foreground));
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layerRemove:hover {
+  color: rgb(var(--destructive));
+}
+
+.layerControls {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.controlsHeader {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(var(--foreground));
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.controlGroup {
+  margin-bottom: 16px;
+}
+
+.controlLabel {
+  display: block;
+  font-size: 11px;
+  color: rgb(var(--foreground));
+  margin-bottom: 4px;
+  font-family: monospace;
+}
+
+.controlSelect {
+  width: 100%;
+  padding: 4px 8px;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  font-size: 11px;
+  font-family: monospace;
+  cursor: pointer;
+}
+
+.controlSelect:focus {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 1px;
+}
+
+.controlSlider {
+  width: 100%;
+  cursor: pointer;
+}
+
+.rangeInputs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rangeInput {
+  flex: 1;
+  padding: 4px 8px;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  font-size: 11px;
+  font-family: monospace;
+}
+
+.rangeInput:focus {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 1px;
+}
+
+.resetButton {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  padding: 6px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 12px;
+}
+
+.resetButton:hover {
+  background: rgb(var(--muted));
+  border-color: rgb(var(--accent));
+  color: rgb(var(--accent));
+}
+
+/* Image Carousel Styles */
+.carouselOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.carouselContainer {
+  width: 90vw;
+  height: 90vh;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius);
+  position: relative;
+}
+
+.carouselClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+}
+
+.carouselClose:hover {
+  background: rgb(var(--destructive));
+  color: white;
+}
+
+.carouselNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  font-size: 48px;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.carouselNav:hover:not(:disabled) {
+  background: rgb(var(--accent));
+  color: white;
+  border-color: rgb(var(--accent));
+}
+
+.carouselNav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carouselNavPrev {
+  left: 20px;
+}
+
+.carouselNavNext {
+  right: 20px;
+}
+
+.carouselContent {
+  flex: 1;
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.carouselImageContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.carouselImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.carouselLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: rgb(var(--muted-foreground));
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.carouselNoImage {
+  color: rgb(var(--muted-foreground));
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.carouselInfo {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.carouselHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.carouselTitle {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(var(--foreground));
+  font-family: monospace;
+  word-break: break-all;
+  margin: 0;
+}
+
+.carouselCounter {
+  font-size: 12px;
+  color: rgb(var(--muted-foreground));
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+.carouselMetadata {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metadataItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.metadataLabel {
+  color: rgb(var(--muted-foreground));
+  font-weight: bold;
+}
+
+.metadataValue {
+  color: rgb(var(--foreground));
+}
+
+.carouselBounds {
+  padding: 12px;
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius);
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.boundsValues {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 8px;
+  color: rgb(var(--foreground));
+}
+
+.carouselActions {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.carouselAddLayer {
+  width: 100%;
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
+  border: none;
+  padding: 10px 16px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: var(--radius);
+}
+
+.carouselAddLayer:hover {
+  opacity: 0.9;
+}
+
+.carouselThumbnails {
+  height: 80px;
+  padding: 10px;
+  border-top: 1px solid rgb(var(--border));
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  background: rgb(var(--muted));
+}
+
+.carouselThumbnail {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border: 2px solid rgb(var(--border));
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.carouselThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carouselThumbnailEmpty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--muted));
+  color: rgb(var(--muted-foreground));
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.carouselThumbnail:hover {
+  border-color: rgb(var(--accent));
+}
+
+.carouselThumbnailActive {
+  border-color: rgb(var(--accent));
+  box-shadow: 0 0 0 2px rgb(var(--accent) / 0.3);
+}
+
+/* Processing Panel Styles */
+.processingPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.formButton {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--foreground));
+  padding: 6px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.formButton:hover {
+  background: rgb(var(--muted));
+  border-color: rgb(var(--accent));
+  color: rgb(var(--accent));
+}
+
+.jobsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jobItem {
+  background: rgb(var(--muted));
+  border: 1px solid rgb(var(--border));
+  padding: 8px;
+  border-radius: var(--radius);
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.jobHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.jobType {
+  color: rgb(var(--foreground));
+  font-weight: bold;
+}
+
+.jobStatus {
+  color: rgb(var(--muted-foreground));
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.jobProgress {
+  height: 4px;
+  background: rgb(var(--border));
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.jobProgressBar {
+  height: 100%;
+  background: rgb(var(--accent));
+  transition: width 0.3s ease;
+}

@@ -6,13 +6,51 @@
 @import 'leaflet/dist/leaflet.css';
 @import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 
+/* Support for transparent satellite tiles */
+.leaflet-tile-container img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Ensure proper transparency blending */
+.leaflet-tile-transparent {
+  mix-blend-mode: normal;
+}
+
 /* Global box-sizing rule */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-/* 90s/00s Aesthetic - SATI Platform */
+/* SATI GIS Platform - Modern Theme System */
 :root {
+  /* Dark Theme (Default) */
+  --background: 9 9 11;
+  --foreground: 250 250 250;
+  --muted: 24 24 27;
+  --muted-foreground: 161 161 170;
+  --card: 24 24 27;
+  --card-foreground: 250 250 250;
+  --border: 39 39 42;
+  /* Tailwind blue-500 for primary CTAs */
+  --primary: 59 130 246;
+  --primary-foreground: 250 250 250;
+  --secondary: 39 39 42;
+  /* Tailwind blue-400 for interactive states */
+  --accent: 96 165 250;
+  --destructive: 239 68 68;
+  --success: 34 197 94;
+  --warning: 251 146 60;
+  --info: 59 130 246;
+
+  /* Spacing & Dimensions */
+  --radius: 6px;
+  --panel-width-left: 320px;
+  --panel-width-right: 350px;
+  --toolbar-height: 40px;
+  --statusbar-height: 25px;
+
+  /* Legacy 90s/00s styles (for existing pages) */
   --bg-main: #c0c0c0;
   --bg-panel: #ffffff;
   --border-color: #000000;
@@ -20,8 +58,29 @@
   --link-color: #0000ff;
   --link-visited: #551a8b;
   --link-hover: #ff0000;
-  --success: #008000;
+  --success-legacy: #008000;
   --error: #ff0000;
+}
+
+/* Light theme override */
+[data-theme="light"] {
+  --background: 255 255 255;
+  --foreground: 9 9 11;
+  --muted: 244 244 245;
+  --muted-foreground: 113 113 122;
+  --card: 255 255 255;
+  --card-foreground: 9 9 11;
+  --border: 228 228 231;
+  /* Tailwind blue-500 for primary CTAs */
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --secondary: 244 244 245;
+  /* Tailwind blue-400 for interactive states */
+  --accent: 96 165 250;
+  --destructive: 239 68 68;
+  --success: 34 197 94;
+  --warning: 251 146 60;
+  --info: 59 130 246;
 }
 
 body {
@@ -33,14 +92,16 @@ body {
   min-height: 100vh;
 }
 
-/* Links */
+/* Links - using modern theme variables */
 a {
-  color: var(--link-color);
+  color: rgb(var(--accent));
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-a:visited { color: var(--link-visited); }
-a:hover { color: var(--link-hover); }
+a:hover {
+  text-decoration-thickness: 2px;
+}
 
 /* Old school panels */
 .panel {
