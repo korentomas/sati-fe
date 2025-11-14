@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import styles from './Workspace.module.css'
 import SearchPanel from './Panels/SearchPanel'
 import LayersPanel from './Panels/LayersPanel'
 import ProcessingPanel from './Panels/ProcessingPanel'
+import { SceneResponse } from '@/lib/api/client'
 
 interface LeftPanelProps {
   isOpen: boolean
@@ -14,7 +14,7 @@ interface LeftPanelProps {
   onLayerSelect: (layerId: string) => void
   selectedLayers: string[]
   drawnPolygon?: GeoJSON.Polygon
-  onSceneAdd?: (scene: any) => void
+  onSceneAdd?: (scene: SceneResponse) => void
 }
 
 export default function LeftPanel({

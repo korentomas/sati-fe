@@ -83,7 +83,7 @@ export default function WorkspaceMap({
     })
 
     // Handle polygon creation
-    map.on('pm:create', (e: any) => {
+    map.on('pm:create', (e: { layer: L.Layer; shape: string }) => {
       const { layer, shape } = e
       if (shape === 'Rectangle' || shape === 'Polygon') {
         // Clear previous drawings
@@ -93,8 +93,8 @@ export default function WorkspaceMap({
         drawnItems.addLayer(layer)
 
         // Convert to GeoJSON and notify parent
-        const geoJson = layer.toGeoJSON() as GeoJSON.Feature<GeoJSON.Polygon>
-        if (onPolygonDrawn) {
+        const geoJson = layer.toGeoJSON?.() as GeoJSON.Feature<GeoJSON.Polygon> | undefined
+        if (geoJson && onPolygonDrawn) {
           onPolygonDrawn(geoJson.geometry)
         }
       }
@@ -225,9 +225,9 @@ export default function WorkspaceMap({
           }
 
           // Check if bands have changed (requires new tile layer)
-          const currentUrl = (existingTileLayer as any)._url
+          const currentUrl = (existingTileLayer as L.TileLayer & { _url?: string })._url
           const expectedBands = layer.visualization.bands
-          if (!currentUrl.includes(`bands=${expectedBands}`)) {
+          if (currentUrl && !currentUrl.includes(`bands=${expectedBands}`)) {
             // Bands changed, need to recreate tile layer
             map.removeLayer(existingTileLayer)
             tileLayers.delete(layer.id)

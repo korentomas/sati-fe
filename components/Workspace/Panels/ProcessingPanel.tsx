@@ -57,7 +57,7 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
       }
 
       // Build request based on processing type
-      let request: any = {
+      let request: Record<string, unknown> = {
         scene_ids: sceneIds,
         aggregation_method:
           selectedLayerIds.length > 1 ? aggregationMethod : AggregationMethod.MEAN,
@@ -81,17 +81,18 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
         response = await apiClient.createProcessingJob(request)
       }
 
-      if (response.error) {
+      if (response.error || !response.data) {
         console.error('Processing failed:', response.error)
         return
       }
 
+      const data = response.data as Record<string, unknown>
       // Add job to local state
       const job: ProcessingJob = {
-        id: response.data.job_id,
-        type: processingType === 'indices' ? selectedIndex : processingType,
-        status: response.data.status || 'pending',
-        progress: response.data.progress || 0,
+        id: (data.job_id as string) || '',
+        type: (processingType === 'indices' ? selectedIndex : processingType) as string,
+        status: (data.status as ProcessingJob['status']) || 'pending',
+        progress: (data.progress as number) || 0,
         layerIds: selectedLayerIds,
         aggregationMethod: selectedLayerIds.length > 1 ? aggregationMethod : undefined,
         createdAt: new Date(),
@@ -111,7 +112,8 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
     try {
       const response = await apiClient.getProcessingResult(jobId)
       if (response.data) {
-        const result = response.data
+        const result = response.data as Record<string, unknown>
+        const statistics = result.statistics as Record<string, unknown> | undefined
 
         // Add as new layer to the map
         const newLayer = {
@@ -124,15 +126,15 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
             contrast: 0,
             opacity: 80,
             bands: 'ndvi',
-            min: result.statistics?.min || -1,
-            max: result.statistics?.max || 1,
+            min: (statistics?.min as number) || -1,
+            max: (statistics?.max as number) || 1,
             gamma: 1,
           },
           result: {
             job_id: jobId,
-            type: result.index_type || result.type,
-            file_path: result.output_file,
-            statistics: result.statistics,
+            type: ((result.index_type || result.type) as string) || 'unknown',
+            file_path: (result.output_file as string) || '',
+            statistics: statistics,
           },
         }
 
@@ -176,26 +178,30 @@ export default function ProcessingPanel({ selectedLayers }: ProcessingPanelProps
       try {
         const response = await apiClient.getProcessingJob(jobId)
         if (response.data) {
+          const data = response.data as Record<string, unknown>
+          const status = (data.status as ProcessingJob['status']) || 'pending'
+          const progress = (data.progress as number) || 0
+
           setProcessingJobs((prev) =>
             prev.map((job) =>
               job.id === jobId
                 ? {
                     ...job,
-                    status: response.data.status,
-                    progress: response.data.progress || 0,
+                    status,
+                    progress,
                   }
                 : job
             )
           )
 
           // Stop polling if job is complete
-          if (['completed', 'failed', 'cancelled'].includes(response.data.status)) {
+          if (['completed', 'failed', 'cancelled'].includes(status)) {
             clearInterval(pollInterval)
 
             // If completed, add result as a new layer
-            if (response.data.status === 'completed' && response.data.result_url) {
+            if (status === 'completed' && data.result_url) {
               // TODO: Add result as new layer to map
-              console.log('Processing completed:', response.data)
+              console.log('Processing completed:', data)
             }
           }
         }

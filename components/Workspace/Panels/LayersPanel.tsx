@@ -1,6 +1,6 @@
 'use client'
 
-import { useLayerStore } from '@/lib/stores/layerStore'
+import { useLayerStore, type LayerVisualization } from '@/lib/stores/layerStore'
 import styles from '../Workspace.module.css'
 
 interface LayersPanelProps {
@@ -195,7 +195,7 @@ export default function LayersPanel({ selectedLayers, onLayerSelect }: LayersPan
           <button
             className={styles.resetButton}
             onClick={() => {
-              const resetValues: any = {
+              const resetValues: Partial<LayerVisualization> = {
                 opacity: 100,
                 min: activeLayer.type === 'processing' ? -1 : 0,
                 max: 1,

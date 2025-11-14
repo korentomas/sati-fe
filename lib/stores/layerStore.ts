@@ -24,7 +24,7 @@ export interface Layer {
     job_id: string
     type: string
     file_path: string
-    statistics?: any
+    statistics?: Record<string, unknown>
   }
 }
 
