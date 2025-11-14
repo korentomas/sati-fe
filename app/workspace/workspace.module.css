@@ -15,7 +15,7 @@
   align-items: center;
   justify-content: center;
   background: rgb(var(--background));
-  color: rgb(var(--primary));
+  color: rgb(var(--muted-foreground));
   font-family: monospace;
   font-size: 14px;
   letter-spacing: 2px;

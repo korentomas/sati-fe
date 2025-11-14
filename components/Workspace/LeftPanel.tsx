@@ -4,7 +4,6 @@ import { useState } from 'react'
 import styles from './Workspace.module.css'
 import SearchPanel from './Panels/SearchPanel'
 import LayersPanel from './Panels/LayersPanel'
-import DrawPanel from './Panels/DrawPanel'
 import ProcessingPanel from './Panels/ProcessingPanel'
 
 interface LeftPanelProps {
@@ -14,6 +13,8 @@ interface LeftPanelProps {
   onToggle: () => void
   onLayerSelect: (layerId: string) => void
   selectedLayers: string[]
+  drawnPolygon?: GeoJSON.Polygon
+  onSceneAdd?: (scene: any) => void
 }
 
 export default function LeftPanel({
@@ -22,12 +23,13 @@ export default function LeftPanel({
   onTabChange,
   onToggle,
   onLayerSelect,
-  selectedLayers
+  selectedLayers,
+  drawnPolygon,
+  onSceneAdd
 }: LeftPanelProps) {
   const tabs = [
     { id: 'search', label: 'SEARCH' },
     { id: 'layers', label: 'LAYERS' },
-    { id: 'draw', label: 'DRAW' },
     { id: 'process', label: 'PROCESS' }
   ]
 
@@ -52,14 +54,18 @@ export default function LeftPanel({
 
       {isOpen && (
         <div className={styles.panelContent}>
-          {activeTab === 'search' && <SearchPanel />}
+          {activeTab === 'search' && (
+            <SearchPanel
+              drawnPolygon={drawnPolygon}
+              onLayerAdd={onSceneAdd}
+            />
+          )}
           {activeTab === 'layers' && (
             <LayersPanel
               selectedLayers={selectedLayers}
               onLayerSelect={onLayerSelect}
             />
           )}
-          {activeTab === 'draw' && <DrawPanel />}
           {activeTab === 'process' && (
             <ProcessingPanel selectedLayers={selectedLayers} />
           )}

@@ -41,6 +41,57 @@ interface ApiKeyResponse {
   expires_at?: string
 }
 
+// Imagery types
+interface GeoJSONGeometry {
+  type: string
+  coordinates: number[][][] | number[][]
+}
+
+interface SearchRequest {
+  geometry?: GeoJSONGeometry
+  bbox?: number[]
+  date_from: string
+  date_to: string
+  collections?: string[]
+  cloud_cover_max?: number
+  limit?: number
+}
+
+interface SceneProperties {
+  datetime: string
+  cloud_cover?: number
+  platform?: string
+  instrument?: string
+  gsd?: number
+}
+
+interface SceneResponse {
+  id: string
+  collection: string
+  bbox: number[]
+  geometry: GeoJSONGeometry
+  properties: SceneProperties
+  thumbnail_url?: string
+  assets: Record<string, any>
+}
+
+interface SearchResponse {
+  total: number
+  returned: number
+  scenes: SceneResponse[]
+  next_token?: string
+}
+
+interface CollectionInfo {
+  id: string
+  title: string
+  description?: string
+  temporal_extent?: (string | null)[]
+  spatial_extent?: number[]
+  providers: string[]
+  license?: string
+}
+
 class ApiClient {
   private baseUrl: string
   private token: string | null = null
@@ -188,6 +239,64 @@ class ApiClient {
     }
     return null
   }
+
+  // Imagery endpoints
+  async getCollections(): Promise<ApiResponse<CollectionInfo[]>> {
+    return this.request<CollectionInfo[]>('/imagery/collections')
+  }
+
+  async searchImagery(request: SearchRequest): Promise<ApiResponse<SearchResponse>> {
+    return this.request<SearchResponse>('/imagery/search', {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  }
+
+  async getScene(collectionId: string, sceneId: string): Promise<ApiResponse<SceneResponse>> {
+    return this.request<SceneResponse>(`/imagery/scenes/${collectionId}/${sceneId}`)
+  }
+
+  // Generate tile URL for a scene
+  getTileUrl(sceneId: string, z: number, x: number, y: number, bands?: string): string {
+    const params = new URLSearchParams()
+    if (bands) params.append('bands', bands)
+    const query = params.toString()
+    return `${this.baseUrl}/imagery/tiles/${sceneId}/{z}/{x}/{y}.png${query ? '?' + query : ''}`
+  }
+
+  // Processing endpoints
+  async createProcessingJob(request: any): Promise<ApiResponse<any>> {
+    return this.request<any>('/processing/jobs', {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  }
+
+  async createSpectralIndex(request: any): Promise<ApiResponse<any>> {
+    return this.request<any>('/processing/spectral-index', {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  }
+
+  async getProcessingJob(jobId: string): Promise<ApiResponse<any>> {
+    return this.request<any>(`/processing/jobs/${jobId}`)
+  }
+
+  async listProcessingJobs(status?: string): Promise<ApiResponse<any[]>> {
+    const params = status ? `?status=${status}` : ''
+    return this.request<any[]>(`/processing/jobs${params}`)
+  }
+
+  async cancelProcessingJob(jobId: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/processing/jobs/${jobId}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async getProcessingResult(jobId: string): Promise<ApiResponse<any>> {
+    return this.request<any>(`/processing/jobs/${jobId}/result`)
+  }
 }
 
 // Export singleton instance
@@ -202,4 +311,10 @@ export type {
   UserProfile,
   ApiKeyRequest,
   ApiKeyResponse,
+  GeoJSONGeometry,
+  SearchRequest,
+  SceneProperties,
+  SceneResponse,
+  SearchResponse,
+  CollectionInfo,
 }

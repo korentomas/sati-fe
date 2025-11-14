@@ -22,7 +22,8 @@
     "next": "^16.0.2-canary.17",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
